@@ -151,21 +151,24 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({children}) => {
     dispatch({type: 'SET_SWAPI_DATA', payload: data});
   }, []);
 
-  // Computed values
-  const completedTodos = state.todos.filter(todo => todo.completed);
-  const incompleteTodos = state.todos.filter(todo => !todo.completed);
+  const completedTodos = useMemo(
+    () => state.todos.filter(todo => todo.completed),
+    [state.todos]
+  );
+  const incompleteTodos = useMemo(
+    () => state.todos.filter(todo => !todo.completed),
+    [state.todos]
+  );
   const totalTodos = state.todos.length;
   const completionPercentage = totalTodos > 0 ? (completedTodos.length / totalTodos) * 100 : 0;
 
-  // Group todos by difficulty
-  const todosByDifficulty = {
+  const todosByDifficulty = useMemo(() => ({
     padawan: state.todos.filter(todo => todo.difficulty === 'padawan'),
     knight: state.todos.filter(todo => todo.difficulty === 'knight'),
     master: state.todos.filter(todo => todo.difficulty === 'master'),
-  };
+  }), [state.todos]);
 
-  // Calculate completion stats by difficulty
-  const completionByDifficulty = {
+  const completionByDifficulty = useMemo(() => ({
     padawan: {
       completed: todosByDifficulty.padawan.filter(todo => todo.completed).length,
       total: todosByDifficulty.padawan.length,
@@ -178,7 +181,7 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({children}) => {
       completed: todosByDifficulty.master.filter(todo => todo.completed).length,
       total: todosByDifficulty.master.length,
     },
-  };
+  }), [todosByDifficulty]);
 
   const contextValue: TodoContextType = useMemo(() => ({
     // State

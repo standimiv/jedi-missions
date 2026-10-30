@@ -1,8 +1,22 @@
-import { render, screen } from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
 import App from './App';
 
-test('renders learn react link', () => {
+jest.mock('./hooks/useSwapi', () => {
+  const fetchRandomData = jest.fn(() => Promise.resolve());
+  return {
+    useSwapi: () => ({
+      data: {people: [], planets: [], starships: [], species: []},
+      isLoading: false,
+      error: null,
+      fetchRandomData,
+      hasData: false,
+    }),
+  };
+});
+
+jest.mock('./components/StarField', () => () => null);
+
+test('renders Jedi Missions heading', () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  expect(screen.getByRole('heading', {name: /jedi missions/i})).toBeInTheDocument();
 });

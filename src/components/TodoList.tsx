@@ -86,7 +86,7 @@ const TodoList: React.FC = () => {
             <span className="title-icon" aria-hidden="true">⚔️</span>
             Active Missions
           </h3>
-          <ul className="todo-grid" role="list" aria-label="Active missions">
+          <ul className="todo-grid" aria-label="Active missions">
             {incompleteTodos.map(todo => (
               <TodoItem key={todo.id} todo={todo} />
             ))}
@@ -101,7 +101,7 @@ const TodoList: React.FC = () => {
             <span className="title-icon" aria-hidden="true">✨</span>
             Completed Missions
           </h3>
-          <ul className="todo-grid" role="list" aria-label="Completed missions">
+          <ul className="todo-grid" aria-label="Completed missions">
             {completedTodos.map(todo => (
               <TodoItem key={todo.id} todo={todo} />
             ))}

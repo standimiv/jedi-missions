@@ -1,10 +1,5 @@
 import {Todo, TaskTemplate, TemplateData, SwapiDataType} from '../types/app';
-import {
-  TASK_TEMPLATES,
-  getRandomDifficulty,
-  getRandomTemplateByDifficulty,
-  validateTemplateData
-} from './taskTemplates';
+import {TASK_TEMPLATES} from './taskTemplates';
 
 // Generate a unique ID for tasks
 export const generateTaskId = (): string => {
@@ -231,10 +226,12 @@ export const getTaskStats = (tasks: Todo[]) => {
   };
 };
 
-export default {
+const taskGenerator = {
   generateTasks,
   generateSingleTask,
   generateFallbackTasks,
   generateCustomTask,
   getTaskStats,
 };
+
+export default taskGenerator;
