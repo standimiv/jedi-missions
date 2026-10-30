@@ -1,0 +1,116 @@
+/* Sith-Inspired Theme Variables */
+:root {
+  /* Primary Sith Color Palette */
+  --color-sith-red: #dc143c;
+  --color-sith-dark-red: #8b0000;
+  --color-sith-orange: #ff4500;
+  --color-sith-yellow: #ffd700;
+
+  /* Dark Background Colors */
+  --color-dark-primary: #0a0a0a;
+  --color-dark-secondary: #1a1a1a;
+  --color-dark-tertiary: #2a2a2a;
+  --color-dark-accent: #333333;
+
+  /* Text Colors */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #cccccc;
+  --color-text-muted: #888888;
+  --color-text-sith: var(--color-sith-red);
+
+  /* Interactive Elements */
+  --color-interactive-hover: var(--color-sith-orange);
+  --color-interactive-active: var(--color-sith-yellow);
+  --color-interactive-focus: var(--color-sith-red);
+
+  /* Difficulty Level Colors */
+  --color-padawan: #4a90e2;
+  --color-knight: var(--color-sith-orange);
+  --color-master: var(--color-sith-red);
+
+  /* Glow Effects */
+  --glow-sith-red: 0 0 10px var(--color-sith-red), 0 0 20px var(--color-sith-red), 0 0 30px var(--color-sith-red);
+  --glow-sith-orange: 0 0 10px var(--color-sith-orange), 0 0 20px var(--color-sith-orange);
+  --glow-subtle: 0 0 5px rgba(220, 20, 60, 0.3);
+
+  /* Typography */
+  --font-family-primary: 'Arial', 'Helvetica', sans-serif;
+  --font-family-heading: 'Arial Black', 'Helvetica', sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 2rem;
+
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
+  /* Border Radius */
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+
+  /* Transitions */
+  --transition-fast: 0.15s ease-in-out;
+  --transition-normal: 0.3s ease-in-out;
+  --transition-slow: 0.5s ease-in-out;
+
+  /* Animation Durations */
+  --animation-fast: 0.2s;
+  --animation-normal: 0.5s;
+  --animation-slow: 1s;
+  --animation-very-slow: 2s;
+
+  /* Z-Index Layers */
+  --z-starfield: -1;
+  --z-content: 1;
+  --z-modal: 100;
+  --z-tooltip: 200;
+}
+
+/* Base dark theme application */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--color-dark-primary);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-primary);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+/* Utility classes for glow effects */
+.glow-red {
+  box-shadow: var(--glow-sith-red);
+}
+
+.glow-orange {
+  box-shadow: var(--glow-sith-orange);
+}
+
+.glow-subtle {
+  box-shadow: var(--glow-subtle);
+}
+
+/* Utility classes for text colors */
+.text-sith {
+  color: var(--color-sith-red);
+}
+
+.text-secondary {
+  color: var(--color-text-secondary);
+}
+
+.text-muted {
+  color: var(--color-text-muted);
+}

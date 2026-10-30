@@ -1,0 +1,319 @@
+/* AddTodo Component Styles */
+.add-todo-container {
+  width: 100%;
+  margin-bottom: var(--spacing-xl);
+}
+
+/* Collapsed State */
+.add-todo-container.collapsed {
+  display: flex;
+  justify-content: center;
+}
+
+.expand-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg) var(--spacing-xl);
+  background: linear-gradient(135deg, var(--color-dark-secondary), var(--color-dark-tertiary));
+  border: 2px dashed var(--color-sith-red);
+  border-radius: var(--border-radius-lg);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  font-size: var(--font-size-lg);
+  font-weight: bold;
+  transition: all var(--transition-normal);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.expand-btn:hover {
+  background: linear-gradient(135deg, var(--color-sith-red), var(--color-sith-orange));
+  border-color: var(--color-sith-orange);
+  box-shadow: var(--glow-sith-red);
+  transform: translateY(-2px);
+}
+
+.expand-icon {
+  font-size: var(--font-size-xl);
+  transition: transform var(--transition-normal);
+}
+
+.expand-btn:hover .expand-icon {
+  transform: rotate(90deg);
+}
+
+/* Expanded State */
+.add-todo-container.expanded {
+  background: linear-gradient(135deg, var(--color-dark-secondary), var(--color-dark-tertiary));
+  border: 1px solid var(--color-sith-red);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow:
+    0 8px 25px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(220, 20, 60, 0.1);
+}
+
+/* Form Header */
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--color-dark-accent);
+}
+
+.form-title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-xl);
+  text-shadow: 0 0 5px var(--color-sith-red);
+}
+
+.title-icon {
+  font-size: var(--font-size-lg);
+}
+
+.collapse-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: var(--font-size-lg);
+  padding: var(--spacing-xs);
+  border-radius: var(--border-radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.collapse-btn:hover {
+  background: var(--color-dark-accent);
+  color: var(--color-sith-red);
+}
+
+/* Form Styles */
+.add-todo-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.input-label {
+  font-size: var(--font-size-sm);
+  font-weight: bold;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Mission Text Input */
+.mission-input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--color-dark-accent);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+  font-family: inherit;
+  resize: vertical;
+  min-height: 80px;
+  transition: all var(--transition-normal);
+}
+
+.mission-input:focus {
+  outline: none;
+  border-color: var(--color-sith-red);
+  box-shadow: 0 0 10px rgba(220, 20, 60, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.mission-input::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.7;
+}
+
+.character-count {
+  text-align: right;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+/* Difficulty Selection */
+.difficulty-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.difficulty-option {
+  cursor: pointer;
+}
+
+.difficulty-radio {
+  display: none;
+}
+
+.difficulty-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 2px solid var(--color-dark-accent);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+  transition: all var(--transition-normal);
+  text-align: center;
+}
+
+.difficulty-card:hover {
+  border-color: var(--color-sith-orange);
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-2px);
+}
+
+.difficulty-card.selected {
+  border-color: var(--color-sith-red);
+  background: rgba(220, 20, 60, 0.1);
+  box-shadow: var(--glow-subtle);
+}
+
+.difficulty-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.difficulty-icon {
+  font-size: var(--font-size-lg);
+}
+
+.difficulty-name {
+  font-size: var(--font-size-base);
+  font-weight: bold;
+  text-transform: capitalize;
+  color: var(--color-text-primary);
+}
+
+.difficulty-description {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+/* Specific difficulty colors */
+.difficulty-option:nth-child(1) .difficulty-card.selected {
+  border-color: var(--color-padawan);
+  background: rgba(74, 144, 226, 0.1);
+}
+
+.difficulty-option:nth-child(2) .difficulty-card.selected {
+  border-color: var(--color-knight);
+  background: rgba(255, 69, 0, 0.1);
+}
+
+.difficulty-option:nth-child(3) .difficulty-card.selected {
+  border-color: var(--color-master);
+  background: rgba(220, 20, 60, 0.1);
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: flex-end;
+  margin-top: var(--spacing-md);
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border: none;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all var(--transition-normal);
+}
+
+.action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.btn-icon {
+  font-size: var(--font-size-base);
+}
+
+.cancel-btn {
+  background: linear-gradient(135deg, var(--color-dark-accent), var(--color-dark-tertiary));
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-dark-accent);
+}
+
+.cancel-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--color-dark-tertiary), var(--color-dark-accent));
+  color: var(--color-text-primary);
+  transform: translateY(-1px);
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, var(--color-sith-red), var(--color-sith-dark-red));
+  color: var(--color-text-primary);
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--color-sith-orange), var(--color-sith-red));
+  box-shadow: var(--glow-sith-red);
+  transform: translateY(-1px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .add-todo-container.expanded {
+    padding: var(--spacing-lg);
+  }
+
+  .form-title {
+    font-size: var(--font-size-lg);
+  }
+
+  .difficulty-options {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .action-btn {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .expand-btn {
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-size: var(--font-size-base);
+  }
+
+  .expand-text {
+    display: none;
+  }
+
+  .mission-input {
+    min-height: 60px;
+  }
+}
