@@ -19,5 +19,3 @@ if (!window.matchMedia) {
     }),
   });
 }
-
-HTMLCanvasElement.prototype.getContext = () => null;
