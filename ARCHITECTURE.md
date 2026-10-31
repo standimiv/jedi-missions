@@ -1,8 +1,8 @@
 # Jedi Missions — frontend architecture
 
-This is the architecture note for the app. It is the same review as the Cursor canvas *Jedi Missions Architecture Review*: what the product is, how the frontend is layered, how data flows, and why a distributed **system design** is not required.
+This document describes what the app is, how the frontend is layered, and how data flows at runtime.
 
-Jedi Missions is a single-user, in-browser todo SPA. It calls one public HTTP API and keeps all mission state in React memory. A full system design (capacity, HA, data stores, service topology, consistency) would describe a different product. This document is the application architecture.
+Jedi Missions is a single-user, in-browser mission list. It calls one public HTTP API and keeps mission state in React memory until the page is refreshed.
 
 ## Product
 
@@ -47,47 +47,31 @@ Browser (SPA)
 
 `TodoProvider` holds `AppState`: `todos`, `isLoading`, `error`, `swapiData`. Mutations go through a reducer (`ADD_TODO`, `TOGGLE_TODO`, `DELETE_TODO`, `SET_TODOS`, `SET_LOADING`, `SET_ERROR`, `SET_SWAPI_DATA`). Derived values (completed vs incomplete, counts by difficulty, completion percentage) live on the context value.
 
-`useSwapi` keeps a **second** loading/error/data bag used only for fetching. `App.tsx` copies that into context and generates todos.
+`useSwapi` holds fetch-specific loading, error, and raw name lists. `App.tsx` orchestrates fetch → generate → context updates.
 
 ### SWAPI client
 
-`SwapiClient` is a static wrapper around axios (`timeout: 10000`). Responses are stored in a module-level `Map` for one hour. `getRandomItems` loads page 1 for `count`, then GETs random resource IDs in parallel with `Promise.allSettled`. `useSwapi.fetchRandomData` requests five items from each of people, planets, starships, and species, then keeps **names only** as `TemplateData`.
+`SwapiClient` is a static wrapper around axios (`timeout: 10000`). Responses are stored in a module-level `Map` for one hour. `getRandomItems` loads paginated list results (page 1 plus up to two extra random pages), shuffles the pool, and returns up to the requested count—avoiding invalid resource IDs. `useSwapi.fetchRandomData` requests five items from each of people, planets, starships, and species, then keeps **names only** as `TemplateData`.
 
 ### Mission generation
 
-`TASK_TEMPLATES` are strings with `{character}`, `{planet}`, `{starship}`, `{species}` placeholders and a `requiredData` list. Balanced generation targets ~40% padawan, ~40% knight, ~20% master. If SWAPI fails, `generateFallbackTasks` uses templates with empty `requiredData`. Custom missions go through `generateCustomTask` from `AddTodo`.
+`TASK_TEMPLATES` are strings with `{character}`, `{planet}`, `{starship}`, `{species}` placeholders and a `requiredData` list. Balanced generation targets ~40% padawan, ~40% knight, ~20% master. If SWAPI fails, `generateFallbackTasks` uses templates with empty `requiredData`. Custom missions go through `generateCustomTask` from `AddTodo`. Template eligibility is enforced in `taskGenerator` via `hasRequiredData`.
 
-## Does this need a system design?
+## Failure handling
 
-No. System design is for products with independent parts you operate and must choose before you build: services, stores, traffic, failure domains, consistency.
+- **ErrorBoundary** catches render errors and offers reload / retry.
+- **SWAPI errors** trigger offline fallback missions when generation cannot use live data.
+- **Non-blocking notices:** when missions exist but SWAPI was unavailable, `state.error` carries a short notice while `TodoList` still renders the list (full-screen error UI only when there are zero missions).
+- **Status banner** in `App.tsx` repeats the same message below Mission Control for visibility.
 
-| Design trigger | This project | System design needed? |
-| --- | --- | --- |
-| Multiple services you operate | None. CRA static bundle only. | No |
-| Data you must store | React memory. Lost on refresh. | No |
-| Users, auth, tenancy | Single anonymous browser tab. | No |
-| Scale / capacity | One user, on the order of ~20 HTTP GETs per generate. | No |
-| External dependency | SWAPI.py4e; 10s timeout; random IDs can 404. | A note, not a design doc |
-| Consistency / sync | No shared state across devices. | No |
-| Failure handling | ErrorBoundary + fallback templates + cache. | Client patterns only |
+## Intentional limitations
 
-Worth writing down: this document (component tree, where state lives, generation, SWAPI contract, cache TTL, offline fallback).
+These are product choices, not bugs:
 
-Overkill: load balancers, API gateways, replicas, message buses, Kubernetes, CQRS, or C4 diagrams of backends that do not exist in this repo.
+- **No persistence** — todos live in memory only; refresh clears them.
+- **Dual loading flags** — `useSwapi` and `TodoContext` both track loading so the hook stays reusable; `App.tsx` syncs them during init and “New Missions”.
+- **External API** — availability and rate limits depend on SWAPI.py4e; the in-memory cache reduces repeat traffic within a session.
 
-A system design **would** be required if missions were persisted per user, shared, or served through an API we own in front of SWAPI. Then the design would cover auth, a store, that API, and how to cache or degrade when SWAPI is down.
+## Summary
 
-## Known frontend issues
-
-These are application-architecture nits, not scale problems:
-
-- **Two loading/error sources.** `useSwapi` and `TodoContext`, plus four `useEffect`s in `App.tsx`, can race during init, generate, fallback, and loading sync.
-- **Error can hide the list.** `TodoList` returns error UI whenever `state.error` is set, even if fallback missions were already written.
-- **Random IDs vs SWAPI pages.** Resource IDs are not a dense `1..count` range, so `getRandomItems` often 404s; `allSettled` drops those.
-- **No persistence.** Correct for a demo; blocks any “save my missions” story.
-- **Dead / weak helpers.** `useSwapiResource` is unused; `validateTemplateData` does not actually check the required data type.
-- **Stale leftover docs/tests.** The original CRA “learn react” test and `codebase.md` snapshot may not match the current UI.
-
-## Bottom line
-
-Jedi Missions is a layered student SPA: types, a reducer, an API client, generation logic, and themed UI. That is **application design**. There is no system beyond one browser and one third-party REST API, so there is no system design to write until the product grows a backend, users, or stored data.
+Jedi Missions is a layered React SPA: typed state, a reducer, an API client, template-based generation, and themed UI. All behavior runs in the browser against SWAPI for names at generation time.

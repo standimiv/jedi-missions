@@ -1,4 +1,4 @@
-import {useState, useEffect, useCallback} from 'react';
+import {useState, useCallback} from 'react';
 import {SwapiClient} from '../utils/swapiClient';
 import {
   SwApiPerson,
@@ -101,58 +101,6 @@ export const useSwapi = () => {
     hasData: Object.values(state.data).some(arr => arr && arr.length > 0),
     isEmpty: Object.values(state.data).every(arr => !arr || arr.length === 0),
   };
-};
-
-// Hook for fetching specific SWAPI resource
-export const useSwapiResource = <T>(
-  resourceType: 'people' | 'planets' | 'starships' | 'species',
-  id: number | null
-) => {
-  const [data, setData] = useState<T | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (id === null) return;
-
-    const fetchResource = async () => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        let result: T;
-
-        switch (resourceType) {
-          case 'people':
-            result = await SwapiClient.getPerson(id) as T;
-            break;
-          case 'planets':
-            result = await SwapiClient.getPlanet(id) as T;
-            break;
-          case 'starships':
-            result = await SwapiClient.getStarship(id) as T;
-            break;
-          case 'species':
-            result = await SwapiClient.getSpeciesById(id) as T;
-            break;
-          default:
-            throw new Error(`Unknown resource type: ${resourceType}`);
-        }
-
-        setData(result);
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-        setError(errorMessage);
-        setData(null);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchResource();
-  }, [resourceType, id]);
-
-  return {data, isLoading, error};
 };
 
 export default useSwapi;

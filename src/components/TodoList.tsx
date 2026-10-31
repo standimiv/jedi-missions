@@ -26,8 +26,8 @@ const TodoList: React.FC = () => {
     );
   }
 
-  // Show error state
-  if (state.error) {
+  // Show error state only when there is nothing to display
+  if (state.error && totalTodos === 0) {
     return (
       <div className="todo-list-container">
         <div className="error-state">

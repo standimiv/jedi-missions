@@ -102,33 +102,41 @@ export class SwapiClient {
   }
 
   // Utility method to get random items from a resource type
-  static async getRandomItems<T>(
+  static async getRandomItems<T extends {name: string}>(
     resourceType: 'people' | 'planets' | 'starships' | 'species',
     count: number = 5
   ): Promise<T[]> {
     try {
-      // First, get the first page to know how many total items exist
-      const firstPage = await fetchWithCache<SwapiPaginatedResponse<T>>(`/${resourceType}/?page=1`);
-      const totalCount = firstPage.count;
+      const firstPage = await fetchWithCache<SwapiPaginatedResponse<T>>(
+        `/${resourceType}/?page=1`
+      );
+      const pageSize = firstPage.results.length || 10;
+      const totalPages = Math.max(1, Math.ceil(firstPage.count / pageSize));
+      const pool: T[] = [...firstPage.results];
 
-      // Generate random IDs
-      const randomIds = new Set<number>();
-      while (randomIds.size < Math.min(count, totalCount)) {
-        const randomId = Math.floor(Math.random() * totalCount) + 1;
-        randomIds.add(randomId);
+      const extraPageCount = Math.min(3, totalPages) - 1;
+      const pagesToLoad = new Set<number>();
+      while (pagesToLoad.size < extraPageCount) {
+        pagesToLoad.add(Math.floor(Math.random() * totalPages) + 1);
       }
 
-      // Fetch the random items
-      const promises = Array.from(randomIds).map(id =>
-        fetchWithCache<T>(`/${resourceType}/${id}/`)
-      );
+      for (const page of Array.from(pagesToLoad)) {
+        if (page === 1) {
+          continue;
+        }
+        const pageData = await fetchWithCache<SwapiPaginatedResponse<T>>(
+          `/${resourceType}/?page=${page}`
+        );
+        pool.push(...pageData.results);
+      }
 
-      const results = await Promise.allSettled(promises);
+      const shuffled = [...pool];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
 
-      // Filter out failed requests and return successful ones
-      return results
-        .filter((result) => result.status === 'fulfilled')
-        .map(result => (result as PromiseFulfilledResult<T>).value);
+      return shuffled.slice(0, Math.min(count, shuffled.length));
     } catch (error) {
       console.error(`Error fetching random ${resourceType}:`, error);
       return [];

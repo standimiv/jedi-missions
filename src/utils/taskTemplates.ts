@@ -199,15 +199,4 @@ export const getRandomDifficulty = (): TaskDifficulty => {
   }
 };
 
-// Validate template data requirements
-export const validateTemplateData = (template: TaskTemplate, availableData: string[]): boolean => {
-  return template.requiredData.every(dataType => {
-    // Templates without data requirements are always valid
-    if (template.requiredData.length === 0) return true;
-
-    // Check if we have data for this type
-    return availableData.length > 0;
-  });
-};
-
 export default TASK_TEMPLATES;
