@@ -47,5 +47,8 @@
     "transformIgnorePatterns": [
       "node_modules/(?!axios)/"
     ]
+  },
+  "overrides": {
+    "underscore": "1.13.8"
   }
 }

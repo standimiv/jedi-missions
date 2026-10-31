@@ -55,7 +55,7 @@ Browser (SPA)
 
 ### Mission generation
 
-`TASK_TEMPLATES` are strings with `{character}`, `{planet}`, `{starship}`, `{species}` placeholders and a `requiredData` list. Balanced generation targets ~40% padawan, ~40% knight, ~20% master. If SWAPI fails, `generateFallbackTasks` uses templates with empty `requiredData`. Custom missions go through `generateCustomTask` from `AddTodo`. Template eligibility is enforced in `taskGenerator` via `hasRequiredData`.
+`TASK_TEMPLATES` are strings with `{character}`, `{planet}`, `{starship}`, `{species}` placeholders and a `requiredData` list. Balanced generation targets ~40% padawan, ~40% knight, ~20% master. Each placeholder in a template is filled with a random name from the matching SWAPI list. If SWAPI fails or returns no usable names, the app sets a hook error and `generateFallbackTasks` supplies offline missions. Custom missions go through `generateCustomTask` from `AddTodo`. Template eligibility is enforced in `taskGenerator` via `hasRequiredData`.
 
 ## Failure handling
 
@@ -69,8 +69,9 @@ Browser (SPA)
 These are product choices, not bugs:
 
 - **No persistence** — todos live in memory only; refresh clears them.
-- **Dual loading flags** — `useSwapi` and `TodoContext` both track loading so the hook stays reusable; `App.tsx` syncs them during init and “New Missions”.
+- **Dual loading flags** — `useSwapi` and `TodoContext` both track loading; `App.tsx` syncs hook loading into context only while the mission list is empty, then generation or fallback clears it.
 - **External API** — availability and rate limits depend on SWAPI.py4e; the in-memory cache reduces repeat traffic within a session.
+- **Dev dependencies** — remaining `npm audit` findings are mostly in Create React App’s build/test toolchain (not the production bundle); safe fixes are applied where possible (e.g. `underscore` override); the rest need a CRA migration to remove.
 
 ## Summary
 

@@ -46,13 +46,17 @@ export const useSwapi = () => {
         people: people.map(person => person.name),
         planets: planets.map(planet => planet.name),
         starships: starships.map(ship => ship.name),
-        species: species.map(species => species.name),
+        species: species.map(speciesItem => speciesItem.name),
       };
+
+      const hasAnyNames = Object.values(templateData).some(
+        names => names && names.length > 0
+      );
 
       setState({
         data: templateData,
         isLoading: false,
-        error: null,
+        error: hasAnyNames ? null : 'No usable data returned from SWAPI',
       });
 
       console.log('SWAPI data fetched successfully:', templateData);

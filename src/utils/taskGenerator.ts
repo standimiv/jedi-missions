@@ -7,33 +7,30 @@ export const generateTaskId = (): string => {
 };
 
 // Replace template placeholders with actual SWAPI data
+const pickRandom = (items: string[]): string =>
+  items[Math.floor(Math.random() * items.length)];
+
+const replaceAllPlaceholder = (
+  text: string,
+  placeholder: string,
+  items: string[] | undefined
+): string => {
+  if (!items || items.length === 0) {
+    return text;
+  }
+  let result = text;
+  while (result.includes(placeholder)) {
+    result = result.replace(placeholder, pickRandom(items));
+  }
+  return result;
+};
+
 export const populateTemplate = (template: TaskTemplate, swapiData: TemplateData): string => {
   let populatedText = template.template;
-
-  // Replace character placeholder
-  if (populatedText.includes('{character}') && swapiData.people && swapiData.people.length > 0) {
-    const randomCharacter = swapiData.people[Math.floor(Math.random() * swapiData.people.length)];
-    populatedText = populatedText.replace('{character}', randomCharacter);
-  }
-
-  // Replace planet placeholder
-  if (populatedText.includes('{planet}') && swapiData.planets && swapiData.planets.length > 0) {
-    const randomPlanet = swapiData.planets[Math.floor(Math.random() * swapiData.planets.length)];
-    populatedText = populatedText.replace('{planet}', randomPlanet);
-  }
-
-  // Replace starship placeholder
-  if (populatedText.includes('{starship}') && swapiData.starships && swapiData.starships.length > 0) {
-    const randomStarship = swapiData.starships[Math.floor(Math.random() * swapiData.starships.length)];
-    populatedText = populatedText.replace('{starship}', randomStarship);
-  }
-
-  // Replace species placeholder
-  if (populatedText.includes('{species}') && swapiData.species && swapiData.species.length > 0) {
-    const randomSpecies = swapiData.species[Math.floor(Math.random() * swapiData.species.length)];
-    populatedText = populatedText.replace('{species}', randomSpecies);
-  }
-
+  populatedText = replaceAllPlaceholder(populatedText, '{character}', swapiData.people);
+  populatedText = replaceAllPlaceholder(populatedText, '{planet}', swapiData.planets);
+  populatedText = replaceAllPlaceholder(populatedText, '{starship}', swapiData.starships);
+  populatedText = replaceAllPlaceholder(populatedText, '{species}', swapiData.species);
   return populatedText;
 };
 

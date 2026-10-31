@@ -40,12 +40,22 @@ const AppContent: React.FC = () => {
     }
   }, [fetchRandomData, setLoading, setError, state.todos.length]);
 
+  // Sync hook loading into context only while the mission list is still empty
+  useEffect(() => {
+    if (state.todos.length === 0) {
+      setLoading(swapiLoading);
+    }
+  }, [swapiLoading, setLoading, state.todos.length]);
+
   // Generate tasks when SWAPI data is available
   useEffect(() => {
     if (hasData && state.todos.length === 0) {
       try {
         setSwapiData(swapiData);
         const newTasks = generateTasks(swapiData, 10, true);
+        if (newTasks.length === 0) {
+          throw new Error('No missions could be generated from SWAPI data');
+        }
         setTodos(newTasks);
         setLoading(false);
         console.log('Generated tasks with SWAPI data:', newTasks);
@@ -56,11 +66,6 @@ const AppContent: React.FC = () => {
       }
     }
   }, [hasData, swapiData, setSwapiData, setTodos, setLoading, setError, state.todos.length]);
-
-  // Handle SWAPI loading state
-  useEffect(() => {
-    setLoading(swapiLoading);
-  }, [swapiLoading, setLoading]);
 
   // Handle SWAPI errors and generate fallback tasks
   useEffect(() => {
