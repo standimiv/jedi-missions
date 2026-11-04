@@ -6,7 +6,8 @@
   border-radius: var(--border-radius-lg);
   padding: var(--spacing-lg);
   transition: all var(--transition-normal);
-  overflow: hidden;
+  min-width: 0;
+  overflow: visible;
 }
 
 .todo-item:hover {
@@ -79,6 +80,7 @@
 /* Mission Content */
 .mission-content {
   margin-bottom: var(--spacing-lg);
+  min-width: 0;
 }
 
 .mission-text {
@@ -86,9 +88,9 @@
   line-height: 1.5;
   color: var(--color-text-primary);
   margin-bottom: var(--spacing-sm);
-  min-height: 2.5em;
-  display: flex;
-  align-items: center;
+  display: block;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .mission-date {
@@ -101,6 +103,7 @@
 .action-buttons {
   display: flex;
   gap: var(--spacing-sm);
+  flex-wrap: wrap;
 }
 
 .action-btn {
@@ -116,7 +119,8 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   transition: all var(--transition-fast);
-  flex: 1;
+  flex: 1 1 8rem;
+  min-width: 0;
   justify-content: center;
 }
 
