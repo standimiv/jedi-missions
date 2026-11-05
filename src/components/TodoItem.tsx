@@ -1,4 +1,4 @@
-import React, {useState, memo} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Todo} from '../types/app';
 import {useTodoContext} from '../context/TodoContext';
 import './TodoItem.css';
@@ -10,18 +10,35 @@ interface TodoItemProps {
 const TodoItem: React.FC<TodoItemProps> = ({todo}) => {
   const [isAnimating, setIsAnimating] = useState<'completing' | 'deleting' | null>(null);
   const {toggleTodo, deleteTodo} = useTodoContext();
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleToggle = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
     setIsAnimating('completing');
-    setTimeout(() => {
+    timeoutRef.current = setTimeout(() => {
+      timeoutRef.current = null;
       toggleTodo(todo.id);
       setIsAnimating(null);
     }, 600);
   };
 
   const handleDelete = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
     setIsAnimating('deleting');
-    setTimeout(() => {
+    timeoutRef.current = setTimeout(() => {
+      timeoutRef.current = null;
       deleteTodo(todo.id);
     }, 500);
   };
@@ -53,10 +70,9 @@ const TodoItem: React.FC<TodoItemProps> = ({todo}) => {
   };
 
   return (
-    <div
+    <li
       className={`todo-item ${todo.completed ? 'completed' : ''} difficulty-${todo.difficulty} ${isAnimating === 'completing' ? 'force-completing' : ''
         } ${isAnimating === 'deleting' ? 'lightsaber-deleting' : ''}`}
-      role="listitem"
       aria-labelledby={`todo-text-${todo.id}`}
       aria-describedby={`todo-difficulty-${todo.id} todo-date-${todo.id}`}
     >
@@ -116,8 +132,8 @@ const TodoItem: React.FC<TodoItemProps> = ({todo}) => {
           </div>
         </div>
       )}
-    </div>
+    </li>
   );
 };
 
-export default memo(TodoItem);
+export default TodoItem;

@@ -160,6 +160,18 @@
   color: var(--color-master);
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* Mission Sections */
 .mission-section {
   margin-bottom: var(--spacing-2xl);
@@ -187,8 +199,15 @@
 /* Todo Grid */
 .todo-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
   gap: var(--spacing-lg);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.todo-grid > * {
+  min-width: 0;
 }
 
 /* Responsive Design */

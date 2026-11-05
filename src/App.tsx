@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useCallback, useEffect, useRef} from 'react';
 import {TodoProvider, useTodoContext} from './context/TodoContext';
 import AppLayout from './components/AppLayout';
 import TodoList from './components/TodoList';
@@ -11,90 +11,70 @@ import './App.css';
 // Main app content component (needs to be inside TodoProvider)
 const AppContent: React.FC = () => {
   const {setTodos, setLoading, setError, setSwapiData, state} = useTodoContext();
-  const {
-    data: swapiData,
-    isLoading: swapiLoading,
-    error: swapiError,
-    fetchRandomData,
-    hasData
-  } = useSwapi();
+  const {fetchRandomData} = useSwapi();
+  const requestId = useRef(0);
+  const missionCount = useRef(state.todos.length);
+  missionCount.current = state.todos.length;
 
-  // Generate initial tasks when the app loads
-  useEffect(() => {
-    const initializeTasks = async () => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        // Fetch SWAPI data first
-        await fetchRandomData();
-      } catch (error) {
-        console.error('Failed to fetch SWAPI data:', error);
-        setError('Failed to load Star Wars data. Using fallback missions.');
-      }
-    };
-
-    // Only initialize if we don't have todos yet
-    if (state.todos.length === 0) {
-      initializeTasks();
+  const applyFallback = useCallback(() => {
+    if (missionCount.current > 0) {
+      setError('Using offline missions. Star Wars data unavailable.');
+      return;
     }
-  }, [fetchRandomData, setLoading, setError, state.todos.length]);
-
-  // Generate tasks when SWAPI data is available
-  useEffect(() => {
-    if (hasData && state.todos.length === 0) {
-      try {
-        setSwapiData(swapiData);
-        const newTasks = generateTasks(swapiData, 10, true);
-        setTodos(newTasks);
-        setLoading(false);
-        console.log('Generated tasks with SWAPI data:', newTasks);
-      } catch (error) {
-        console.error('Failed to generate tasks:', error);
-        setError('Failed to generate missions. Please try again.');
-        setLoading(false);
-      }
-    }
-  }, [hasData, swapiData, setSwapiData, setTodos, setLoading, setError, state.todos.length]);
-
-  // Handle SWAPI loading state
-  useEffect(() => {
-    setLoading(swapiLoading);
-  }, [swapiLoading, setLoading]);
-
-  // Handle SWAPI errors and generate fallback tasks
-  useEffect(() => {
-    if (swapiError && state.todos.length === 0) {
-      console.warn('SWAPI error, generating fallback tasks:', swapiError);
-      try {
-        const fallbackTasks = generateFallbackTasks(8);
-        setTodos(fallbackTasks);
-        setError('Using offline missions. Star Wars data unavailable.');
-        setLoading(false);
-      } catch (error) {
-        console.error('Failed to generate fallback tasks:', error);
-        setError('Failed to generate missions. Please refresh the page.');
-        setLoading(false);
-      }
-    }
-  }, [swapiError, setTodos, setError, setLoading, state.todos.length]);
-
-  const handleGenerateNewMissions = async () => {
-    setLoading(true);
-    setError(null);
 
     try {
-      // Clear current todos
-      setTodos([]);
-
-      // Fetch fresh SWAPI data
-      await fetchRandomData();
+      setTodos(generateFallbackTasks(8));
+      setError('Using offline missions. Star Wars data unavailable.');
     } catch (error) {
-      console.error('Failed to generate new missions:', error);
-      setError('Failed to generate new missions. Please try again.');
-      setLoading(false);
+      console.error('Failed to generate fallback tasks:', error);
+      setError('Failed to generate missions. Please refresh the page.');
     }
-  };
+  }, [setError, setTodos]);
+
+  const loadMissions = useCallback(async () => {
+    const id = ++requestId.current;
+    setError(null);
+    setLoading(true);
+
+    try {
+      const data = await fetchRandomData();
+      if (id !== requestId.current) {
+        return;
+      }
+
+      if (!data) {
+        applyFallback();
+        return;
+      }
+
+      setSwapiData(data);
+      const newTasks = generateTasks(data, 10, true);
+      if (newTasks.length === 0) {
+        if (missionCount.current === 0) {
+          applyFallback();
+          return;
+        }
+        setError('Failed to generate missions. Please try again.');
+        return;
+      }
+
+      setTodos(newTasks);
+    } catch (error) {
+      console.error('Failed to generate missions:', error);
+      if (id !== requestId.current) {
+        return;
+      }
+      applyFallback();
+    } finally {
+      if (id === requestId.current) {
+        setLoading(false);
+      }
+    }
+  }, [applyFallback, fetchRandomData, setError, setLoading, setSwapiData, setTodos]);
+
+  useEffect(() => {
+    loadMissions();
+  }, [loadMissions]);
 
   return (
     <AppLayout>
@@ -105,7 +85,7 @@ const AppContent: React.FC = () => {
             <h2 className="content-title">Mission Control</h2>
             <button
               className="generate-btn"
-              onClick={handleGenerateNewMissions}
+              onClick={loadMissions}
               disabled={state.isLoading}
             >
               <span className="btn-icon">🔄</span>

@@ -45,6 +45,18 @@ export const TASK_TEMPLATES: TaskTemplate[] = [
     difficulty: 'padawan',
     requiredData: ['planets'],
   },
+  {
+    id: 'padawan_8',
+    template: 'Practice basic Force meditation in the temple gardens',
+    difficulty: 'padawan',
+    requiredData: [],
+  },
+  {
+    id: 'padawan_9',
+    template: 'Help the archive keepers organize ancient holocrons',
+    difficulty: 'padawan',
+    requiredData: [],
+  },
 
   // KNIGHT LEVEL TASKS (Medium)
   {
@@ -94,6 +106,18 @@ export const TASK_TEMPLATES: TaskTemplate[] = [
     template: 'Pilot {starship} through an asteroid field',
     difficulty: 'knight',
     requiredData: ['starships'],
+  },
+  {
+    id: 'knight_9',
+    template: 'Patrol the temple perimeter through the night cycle',
+    difficulty: 'knight',
+    requiredData: [],
+  },
+  {
+    id: 'knight_10',
+    template: 'Train a squad of younglings in lightsaber safety',
+    difficulty: 'knight',
+    requiredData: [],
   },
 
   // MASTER LEVEL TASKS (Hard)
@@ -157,6 +181,18 @@ export const TASK_TEMPLATES: TaskTemplate[] = [
     difficulty: 'master',
     requiredData: [],
   },
+  {
+    id: 'master_11',
+    template: 'Advise the Council on a threat to the Republic',
+    difficulty: 'master',
+    requiredData: [],
+  },
+  {
+    id: 'master_12',
+    template: 'Hold the line until Republic reinforcements arrive',
+    difficulty: 'master',
+    requiredData: [],
+  },
 ];
 
 // Difficulty distribution for balanced task generation
@@ -197,17 +233,6 @@ export const getRandomDifficulty = (): TaskDifficulty => {
   } else {
     return 'master';
   }
-};
-
-// Validate template data requirements
-export const validateTemplateData = (template: TaskTemplate, availableData: string[]): boolean => {
-  return template.requiredData.every(dataType => {
-    // Templates without data requirements are always valid
-    if (template.requiredData.length === 0) return true;
-
-    // Check if we have data for this type
-    return availableData.length > 0;
-  });
 };
 
 export default TASK_TEMPLATES;

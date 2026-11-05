@@ -2,7 +2,7 @@
 
 Star Wars–themed mission list (todo app). On load it pulls names from [SWAPI.py4e](https://swapi.py4e.com/api), fills mission templates, and lets you complete, abandon, or add custom missions. State lives in the browser only.
 
-Frontend structure, data flow, and why this is not a system-design project: **[ARCHITECTURE.md](./ARCHITECTURE.md)**.
+Frontend structure and data flow: **[ARCHITECTURE.md](./ARCHITECTURE.md)**.
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
