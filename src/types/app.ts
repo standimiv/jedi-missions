@@ -10,6 +10,21 @@ export interface Todo {
   createdAt: Date;
 }
 
+// One line written when a mission is completed
+export interface JournalEntry {
+  id: string;
+  text: string;
+  difficulty: TaskDifficulty;
+  completedAt: string;
+}
+
+// A reusable custom mission the user saved locally
+export interface MissionTemplate {
+  id: string;
+  text: string;
+  difficulty: TaskDifficulty;
+}
+
 // Task template for generation
 export interface TaskTemplate {
   id: string;
@@ -35,6 +50,8 @@ export interface AppState {
   isLoading: boolean;
   error: string | null;
   swapiData: TemplateData;
+  journal: JournalEntry[];
+  templates: MissionTemplate[];
 }
 
 // Actions for todo management
@@ -45,4 +62,6 @@ export type TodoAction =
   | {type: 'SET_TODOS'; payload: Todo[]}
   | {type: 'SET_LOADING'; payload: boolean}
   | {type: 'SET_ERROR'; payload: string | null}
-  | {type: 'SET_SWAPI_DATA'; payload: TemplateData};
+  | {type: 'SET_SWAPI_DATA'; payload: TemplateData}
+  | {type: 'ADD_TEMPLATE'; payload: MissionTemplate}
+  | {type: 'DELETE_TEMPLATE'; payload: string};

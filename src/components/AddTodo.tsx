@@ -1,14 +1,15 @@
 import React, {useState} from 'react';
 import {useTodoContext} from '../context/TodoContext';
-import {generateCustomTask} from '../utils/taskGenerator';
+import {generateCustomTask, generateTaskId} from '../utils/taskGenerator';
 import {TaskDifficulty} from '../types/app';
 import './AddTodo.css';
 
 const AddTodo: React.FC = () => {
-  const {addTodo} = useTodoContext();
+  const {addTodo, addTemplate, deleteTemplate, state} = useTodoContext();
   const [taskText, setTaskText] = useState('');
   const [difficulty, setDifficulty] = useState<TaskDifficulty>('knight');
   const [isExpanded, setIsExpanded] = useState(false);
+  const [templateMessage, setTemplateMessage] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,12 +27,37 @@ const AddTodo: React.FC = () => {
     setTaskText('');
     setDifficulty('knight');
     setIsExpanded(false);
+    setTemplateMessage('');
   };
 
   const handleCancel = () => {
     setTaskText('');
     setDifficulty('knight');
     setIsExpanded(false);
+    setTemplateMessage('');
+  };
+
+  const handleSaveTemplate = () => {
+    const trimmedText = taskText.trim();
+    if (!trimmedText) {
+      return;
+    }
+    const alreadySaved = state.templates.some(
+      template => template.text === trimmedText && template.difficulty === difficulty
+    );
+    if (alreadySaved || state.templates.length >= 20) {
+      setTemplateMessage(alreadySaved ? 'Template already saved.' : 'Template list is full.');
+      return;
+    }
+    addTemplate({id: generateTaskId(), text: trimmedText, difficulty});
+    setTemplateMessage('Template saved.');
+  };
+
+  const applyTemplate = (text: string, nextDifficulty: TaskDifficulty) => {
+    setTaskText(text);
+    setDifficulty(nextDifficulty);
+    setIsExpanded(true);
+    setTemplateMessage('');
   };
 
   const getDifficultyIcon = (diff: TaskDifficulty) => {
@@ -56,6 +82,22 @@ const AddTodo: React.FC = () => {
     }
   };
 
+  const savedTemplates = (
+    <ul className="template-list" aria-label="Saved mission templates">
+      {state.templates.map(template => (
+        <li key={template.id}>
+          <span className="template-text">{template.text}</span>
+          <button type="button" onClick={() => applyTemplate(template.text, template.difficulty)}>
+            Use
+          </button>
+          <button type="button" onClick={() => deleteTemplate(template.id)}>
+            Remove
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+
   if (!isExpanded) {
     return (
       <div className="add-todo-container collapsed">
@@ -66,6 +108,7 @@ const AddTodo: React.FC = () => {
           <span className="expand-icon">➕</span>
           <span className="expand-text">Create Custom Mission</span>
         </button>
+        {state.templates.length > 0 && savedTemplates}
       </div>
     );
   }
@@ -146,6 +189,15 @@ const AddTodo: React.FC = () => {
             Cancel
           </button>
           <button
+            type="button"
+            onClick={handleSaveTemplate}
+            disabled={!taskText.trim()}
+            className="action-btn cancel-btn"
+          >
+            <span className="btn-icon">📌</span>
+            Save template
+          </button>
+          <button
             type="submit"
             disabled={!taskText.trim()}
             className="action-btn submit-btn"
@@ -154,7 +206,11 @@ const AddTodo: React.FC = () => {
             Accept Mission
           </button>
         </div>
+        {templateMessage && (
+          <p className="template-message" role="status">{templateMessage}</p>
+        )}
       </form>
+      {state.templates.length > 0 && savedTemplates}
     </div>
   );
 };

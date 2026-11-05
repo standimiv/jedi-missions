@@ -1,74 +1,21 @@
 # Jedi Missions
 
-Star Wars–themed mission list (todo app). On load it pulls names from [SWAPI.py4e](https://swapi.py4e.com/api), fills mission templates, and lets you complete, abandon, or add custom missions. State lives in the browser only.
+A single-player Star Wars mission list. On a first visit it asks [SWAPI.py4e](https://swapi.py4e.com/api) for names, fills mission templates, and shows about ten missions at padawan, knight, and master difficulty. Complete them, abandon them, or write your own. Rank and the lightsaber bar follow your completion rate.
 
-Frontend structure and data flow: **[ARCHITECTURE.md](./ARCHITECTURE.md)**.
+Missions, the completion journal, and saved custom templates stay in this browser (`localStorage`). A refresh keeps them. If SWAPI is down on an empty list, eight offline templates are used instead, and **Retry SWAPI** tries again without reloading the page. “New Missions” still replaces the current list.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+How the pieces fit: **[ARCHITECTURE.md](./ARCHITECTURE.md)**.
 
-## Available Scripts
+## Scripts
 
-In the project directory, you can run:
+```bash
+npm start     # dev server at http://localhost:3000
+npm test      # Jest
+npm run build # static production bundle in build/
+```
 
-### `npm start`
+## Deploy
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+The production build is a static site. Netlify, Vercel, or any static host can publish `build/`.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+For GitHub Pages, set `"homepage"` in `package.json` to `https://<user>.github.io/<repo>` before building so asset paths match the project site. This repo leaves `homepage` unset so a root host keeps working.

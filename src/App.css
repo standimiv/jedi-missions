@@ -94,6 +94,7 @@
 .status-message {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: var(--spacing-sm);
   padding: var(--spacing-md) var(--spacing-lg);
   border-radius: var(--border-radius-md);
@@ -111,6 +112,28 @@
   background: rgba(74, 144, 226, 0.1);
   border: 1px solid var(--color-padawan);
   color: var(--color-padawan);
+}
+
+.status-message.notice {
+  background: rgba(255, 215, 0, 0.08);
+  border: 1px solid var(--color-sith-yellow);
+  color: var(--color-sith-yellow);
+}
+
+.status-retry {
+  margin-left: auto;
+  background: transparent;
+  color: inherit;
+  border: 1px solid currentColor;
+  border-radius: var(--border-radius-md);
+  padding: 0.25rem 0.75rem;
+  cursor: pointer;
+  font: inherit;
+}
+
+.status-retry:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .status-icon {

@@ -259,6 +259,13 @@
   animation: lightsaber-slash 0.5s ease-in forwards;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .todo-item.force-completing,
+  .todo-item.lightsaber-deleting {
+    animation: none;
+  }
+}
+
 .sr-only {
   position: absolute;
   width: 1px;

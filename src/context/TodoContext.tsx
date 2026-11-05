@@ -1,21 +1,32 @@
-import React, {createContext, useContext, useReducer, ReactNode, useMemo, useCallback} from 'react';
-import {Todo, AppState, TodoAction, TemplateData} from '../types/app';
+import React, {createContext, useContext, useReducer, ReactNode, useMemo, useCallback, useEffect} from 'react';
+import {Todo, AppState, TodoAction, TemplateData, MissionTemplate} from '../types/app';
+import {loadPersisted, savePersisted} from '../utils/storage';
 
-// Initial state
-const initialState: AppState = {
-  todos: [],
-  isLoading: true,
-  error: null,
-  swapiData: {
-    people: [],
-    planets: [],
-    starships: [],
-    species: [],
-  },
+const emptySwapiData: TemplateData = {
+  people: [],
+  planets: [],
+  starships: [],
+  species: [],
 };
 
+// Initial state. Saved missions skip the loading screen; an empty store still fetches.
+const createInitialState = (): AppState => {
+  const persisted = loadPersisted();
+  return {
+    todos: persisted.todos,
+    isLoading: persisted.todos.length === 0,
+    error: null,
+    swapiData: emptySwapiData,
+    journal: persisted.journal,
+    templates: persisted.templates,
+  };
+};
+
+const nextId = (prefix: string): string =>
+  `${prefix}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+
 // Reducer function
-const todoReducer = (state: AppState, action: TodoAction): AppState => {
+export const todoReducer = (state: AppState, action: TodoAction): AppState => {
   switch (action.type) {
     case 'SET_TODOS':
       return {
@@ -31,7 +42,9 @@ const todoReducer = (state: AppState, action: TodoAction): AppState => {
         error: null,
       };
 
-    case 'TOGGLE_TODO':
+    case 'TOGGLE_TODO': {
+      const target = state.todos.find(todo => todo.id === action.payload);
+      const completedNow = Boolean(target && !target.completed);
       return {
         ...state,
         todos: state.todos.map(todo =>
@@ -39,8 +52,20 @@ const todoReducer = (state: AppState, action: TodoAction): AppState => {
             ? {...todo, completed: !todo.completed}
             : todo
         ),
+        journal: completedNow && target
+          ? [
+            ...state.journal,
+            {
+              id: nextId('journal'),
+              text: target.text,
+              difficulty: target.difficulty,
+              completedAt: new Date().toISOString(),
+            },
+          ].slice(-40)
+          : state.journal,
         error: null,
       };
+    }
 
     case 'DELETE_TODO':
       return {
@@ -69,6 +94,25 @@ const todoReducer = (state: AppState, action: TodoAction): AppState => {
         error: null,
       };
 
+    case 'ADD_TEMPLATE': {
+      const alreadySaved = state.templates.some(
+        template => template.text === action.payload.text && template.difficulty === action.payload.difficulty
+      );
+      if (alreadySaved || state.templates.length >= 20) {
+        return state;
+      }
+      return {
+        ...state,
+        templates: [...state.templates, action.payload],
+      };
+    }
+
+    case 'DELETE_TEMPLATE':
+      return {
+        ...state,
+        templates: state.templates.filter(template => template.id !== action.payload),
+      };
+
     default:
       return state;
   }
@@ -89,6 +133,8 @@ interface TodoContextType {
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   setSwapiData: (data: TemplateData) => void;
+  addTemplate: (template: MissionTemplate) => void;
+  deleteTemplate: (id: string) => void;
 
   // Computed values
   completedTodos: Todo[];
@@ -120,7 +166,15 @@ interface TodoProviderProps {
 
 // Provider component
 export const TodoProvider: React.FC<TodoProviderProps> = ({children}) => {
-  const [state, dispatch] = useReducer(todoReducer, initialState);
+  const [state, dispatch] = useReducer(todoReducer, undefined, createInitialState);
+
+  useEffect(() => {
+    savePersisted({
+      todos: state.todos,
+      journal: state.journal,
+      templates: state.templates,
+    });
+  }, [state.todos, state.journal, state.templates]);
 
   // Action creators (wrapped with useCallback for performance)
   const addTodo = useCallback((todo: Todo) => {
@@ -149,6 +203,14 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({children}) => {
 
   const setSwapiData = useCallback((data: TemplateData) => {
     dispatch({type: 'SET_SWAPI_DATA', payload: data});
+  }, []);
+
+  const addTemplate = useCallback((template: MissionTemplate) => {
+    dispatch({type: 'ADD_TEMPLATE', payload: template});
+  }, []);
+
+  const deleteTemplate = useCallback((id: string) => {
+    dispatch({type: 'DELETE_TEMPLATE', payload: id});
   }, []);
 
   const completedTodos = useMemo(
@@ -195,6 +257,8 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({children}) => {
     setLoading,
     setError,
     setSwapiData,
+    addTemplate,
+    deleteTemplate,
 
     // Computed values
     completedTodos,
@@ -212,6 +276,8 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({children}) => {
     setLoading,
     setError,
     setSwapiData,
+    addTemplate,
+    deleteTemplate,
     completedTodos,
     incompleteTodos,
     totalTodos,

@@ -7,8 +7,17 @@ interface TodoItemProps {
   todo: Todo;
 }
 
+const motionDelay = (ms: number): number => {
+  if (typeof window.matchMedia === 'function'
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    return 0;
+  }
+  return ms;
+};
+
 const TodoItem: React.FC<TodoItemProps> = ({todo}) => {
   const [isAnimating, setIsAnimating] = useState<'completing' | 'deleting' | null>(null);
+  const [announcement, setAnnouncement] = useState('');
   const {toggleTodo, deleteTodo} = useTodoContext();
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -25,11 +34,13 @@ const TodoItem: React.FC<TodoItemProps> = ({todo}) => {
       clearTimeout(timeoutRef.current);
     }
     setIsAnimating('completing');
+    const completing = !todo.completed;
     timeoutRef.current = setTimeout(() => {
       timeoutRef.current = null;
       toggleTodo(todo.id);
+      setAnnouncement(completing ? `Mission completed: ${todo.text}` : `Mission reopened: ${todo.text}`);
       setIsAnimating(null);
-    }, 600);
+    }, motionDelay(600));
   };
 
   const handleDelete = () => {
@@ -40,7 +51,8 @@ const TodoItem: React.FC<TodoItemProps> = ({todo}) => {
     timeoutRef.current = setTimeout(() => {
       timeoutRef.current = null;
       deleteTodo(todo.id);
-    }, 500);
+      document.getElementById('mission-list')?.focus();
+    }, motionDelay(500));
   };
 
   const getDifficultyIcon = (difficulty: string) => {
@@ -96,6 +108,8 @@ const TodoItem: React.FC<TodoItemProps> = ({todo}) => {
       </div>
 
       {/* Action Buttons */}
+      <div className="sr-only" aria-live="polite">{announcement}</div>
+
       <div className="action-buttons" role="group" aria-label="Task actions">
         <button
           className={`action-btn complete-btn ${todo.completed ? 'completed' : ''}`}

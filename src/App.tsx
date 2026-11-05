@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {TodoProvider, useTodoContext} from './context/TodoContext';
 import AppLayout from './components/AppLayout';
 import TodoList from './components/TodoList';
@@ -14,6 +14,8 @@ const AppContent: React.FC = () => {
   const {fetchRandomData} = useSwapi();
   const requestId = useRef(0);
   const missionCount = useRef(state.todos.length);
+  const skipInitialFetch = useRef(state.todos.length > 0);
+  const [notice, setNotice] = useState<string | null>(null);
   missionCount.current = state.todos.length;
 
   const applyFallback = useCallback(() => {
@@ -34,6 +36,7 @@ const AppContent: React.FC = () => {
   const loadMissions = useCallback(async () => {
     const id = ++requestId.current;
     setError(null);
+    setNotice(null);
     setLoading(true);
 
     try {
@@ -59,6 +62,9 @@ const AppContent: React.FC = () => {
       }
 
       setTodos(newTasks);
+      if (newTasks.length < 10) {
+        setNotice(`Generated ${newTasks.length} of 10 missions.`);
+      }
     } catch (error) {
       console.error('Failed to generate missions:', error);
       if (id !== requestId.current) {
@@ -73,6 +79,9 @@ const AppContent: React.FC = () => {
   }, [applyFallback, fetchRandomData, setError, setLoading, setSwapiData, setTodos]);
 
   useEffect(() => {
+    if (skipInitialFetch.current) {
+      return;
+    }
     loadMissions();
   }, [loadMissions]);
 
@@ -101,14 +110,28 @@ const AppContent: React.FC = () => {
 
         {/* Mission List */}
         <div className="mission-section">
-          <TodoList />
+          <TodoList onRetry={loadMissions} />
         </div>
 
         {/* Status Information */}
         {state.error && (
-          <div className="status-message error">
+          <div className="status-message error" role="status">
             <span className="status-icon">⚠️</span>
-            {state.error}
+            <span>{state.error}</span>
+            <button
+              type="button"
+              className="status-retry"
+              onClick={loadMissions}
+              disabled={state.isLoading}
+            >
+              Retry SWAPI
+            </button>
+          </div>
+        )}
+        {notice && !state.error && (
+          <div className="status-message notice" role="status">
+            <span className="status-icon">ℹ️</span>
+            <span>{notice}</span>
           </div>
         )}
       </div>
