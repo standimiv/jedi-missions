@@ -40,12 +40,10 @@ const AppContent: React.FC = () => {
     }
   }, [fetchRandomData, setLoading, setError, state.todos.length]);
 
-  // Sync hook loading into context only while the mission list is still empty
+  // Sync SWAPI loading state into context
   useEffect(() => {
-    if (state.todos.length === 0) {
-      setLoading(swapiLoading);
-    }
-  }, [swapiLoading, setLoading, state.todos.length]);
+    setLoading(swapiLoading);
+  }, [swapiLoading, setLoading]);
 
   // Generate tasks when SWAPI data is available
   useEffect(() => {

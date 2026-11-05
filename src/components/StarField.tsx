@@ -98,10 +98,7 @@ const StarField: React.FC = () => {
       if (!current) return;
 
       const ctx = current.getContext('2d');
-      if (!ctx) {
-        animationRef.current = requestAnimationFrame(animate);
-        return;
-      }
+      if (!ctx) return;
 
       drawStars(ctx, current.width, current.height, time);
       animationRef.current = requestAnimationFrame(animate);

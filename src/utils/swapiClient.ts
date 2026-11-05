@@ -116,8 +116,8 @@ export class SwapiClient {
 
       const extraPageCount = Math.min(3, totalPages) - 1;
       const pagesToLoad = new Set<number>();
-      while (pagesToLoad.size < extraPageCount) {
-        pagesToLoad.add(Math.floor(Math.random() * totalPages) + 1);
+      while (pagesToLoad.size < extraPageCount && totalPages > 1) {
+        pagesToLoad.add(Math.floor(Math.random() * (totalPages - 1)) + 2);
       }
 
       for (const page of Array.from(pagesToLoad)) {

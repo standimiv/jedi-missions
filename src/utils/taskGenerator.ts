@@ -10,27 +10,23 @@ export const generateTaskId = (): string => {
 const pickRandom = (items: string[]): string =>
   items[Math.floor(Math.random() * items.length)];
 
-const replaceAllPlaceholder = (
+const replaceFirstPlaceholder = (
   text: string,
   placeholder: string,
   items: string[] | undefined
 ): string => {
-  if (!items || items.length === 0) {
+  if (!items || items.length === 0 || !text.includes(placeholder)) {
     return text;
   }
-  let result = text;
-  while (result.includes(placeholder)) {
-    result = result.replace(placeholder, pickRandom(items));
-  }
-  return result;
+  return text.replace(placeholder, pickRandom(items));
 };
 
 export const populateTemplate = (template: TaskTemplate, swapiData: TemplateData): string => {
   let populatedText = template.template;
-  populatedText = replaceAllPlaceholder(populatedText, '{character}', swapiData.people);
-  populatedText = replaceAllPlaceholder(populatedText, '{planet}', swapiData.planets);
-  populatedText = replaceAllPlaceholder(populatedText, '{starship}', swapiData.starships);
-  populatedText = replaceAllPlaceholder(populatedText, '{species}', swapiData.species);
+  populatedText = replaceFirstPlaceholder(populatedText, '{character}', swapiData.people);
+  populatedText = replaceFirstPlaceholder(populatedText, '{planet}', swapiData.planets);
+  populatedText = replaceFirstPlaceholder(populatedText, '{starship}', swapiData.starships);
+  populatedText = replaceFirstPlaceholder(populatedText, '{species}', swapiData.species);
   return populatedText;
 };
 

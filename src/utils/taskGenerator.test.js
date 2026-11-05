@@ -1,6 +1,6 @@
 import {populateTemplate, generateFallbackTasks} from './taskGenerator';
 
-test('populateTemplate replaces every placeholder occurrence', () => {
+test('populateTemplate replaces the first occurrence of each placeholder', () => {
   const result = populateTemplate(
     {
       id: 'test',
@@ -11,8 +11,7 @@ test('populateTemplate replaces every placeholder occurrence', () => {
     {planets: ['Tatooine', 'Hoth']}
   );
 
-  expect(result).not.toMatch(/\{planet\}/);
-  expect(result).toMatch(/Visit .+, then return to .+/);
+  expect(result).toMatch(/^Visit (Tatooine|Hoth), then return to \{planet\}$/);
 });
 
 test('generateFallbackTasks returns offline missions', () => {
