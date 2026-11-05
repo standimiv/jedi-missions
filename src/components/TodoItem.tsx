@@ -53,10 +53,9 @@ const TodoItem: React.FC<TodoItemProps> = ({todo}) => {
   };
 
   return (
-    <div
+    <li
       className={`todo-item ${todo.completed ? 'completed' : ''} difficulty-${todo.difficulty} ${isAnimating === 'completing' ? 'force-completing' : ''
         } ${isAnimating === 'deleting' ? 'lightsaber-deleting' : ''}`}
-      role="listitem"
       aria-labelledby={`todo-text-${todo.id}`}
       aria-describedby={`todo-difficulty-${todo.id} todo-date-${todo.id}`}
     >
@@ -116,7 +115,7 @@ const TodoItem: React.FC<TodoItemProps> = ({todo}) => {
           </div>
         </div>
       )}
-    </div>
+    </li>
   );
 };
 

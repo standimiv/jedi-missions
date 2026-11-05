@@ -20,3 +20,8 @@ test('renders Jedi Missions heading', () => {
   render(<App />);
   expect(screen.getByRole('heading', {name: /jedi missions/i})).toBeInTheDocument();
 });
+
+test('shows mission control when loaded', () => {
+  render(<App />);
+  expect(screen.getByRole('heading', {name: /mission control/i})).toBeInTheDocument();
+});
