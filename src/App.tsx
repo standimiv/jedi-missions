@@ -13,17 +13,17 @@ const AppContent: React.FC = () => {
   const {setTodos, setLoading, setError, setSwapiData, state} = useTodoContext();
   const {fetchRandomData} = useSwapi();
   const requestId = useRef(0);
-  const hasMissions = useRef(false);
+  const missionCount = useRef(state.todos.length);
+  missionCount.current = state.todos.length;
 
   const applyFallback = useCallback(() => {
-    if (hasMissions.current) {
+    if (missionCount.current > 0) {
       setError('Using offline missions. Star Wars data unavailable.');
       return;
     }
 
     try {
       setTodos(generateFallbackTasks(8));
-      hasMissions.current = true;
       setError('Using offline missions. Star Wars data unavailable.');
     } catch (error) {
       console.error('Failed to generate fallback tasks:', error);
@@ -50,7 +50,7 @@ const AppContent: React.FC = () => {
       setSwapiData(data);
       const newTasks = generateTasks(data, 10, true);
       if (newTasks.length === 0) {
-        if (!hasMissions.current) {
+        if (missionCount.current === 0) {
           applyFallback();
           return;
         }
@@ -59,7 +59,6 @@ const AppContent: React.FC = () => {
       }
 
       setTodos(newTasks);
-      hasMissions.current = true;
     } catch (error) {
       console.error('Failed to generate missions:', error);
       if (id !== requestId.current) {

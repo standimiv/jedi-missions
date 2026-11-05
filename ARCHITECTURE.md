@@ -55,12 +55,12 @@ Browser (SPA)
 
 ### Mission generation
 
-`TASK_TEMPLATES` are strings with `{character}`, `{planet}`, `{starship}`, `{species}` placeholders and a `requiredData` list. Balanced generation targets ~40% padawan, ~40% knight, ~20% master. Each placeholder in a template is filled with a random name from the matching SWAPI list. If SWAPI fails or returns no usable names on the first load, `fetchRandomData` returns `null` and `generateFallbackTasks` supplies the eight offline templates (no placeholders). A later failure leaves the missions already on screen. Custom missions go through `generateCustomTask` from `AddTodo`. Template eligibility is enforced in `taskGenerator` via `hasRequiredData`.
+`TASK_TEMPLATES` are strings with `{character}`, `{planet}`, `{starship}`, `{species}` placeholders and a `requiredData` list. Balanced generation targets ~40% padawan, ~40% knight, ~20% master. Each placeholder in a template is filled with a random name from the matching SWAPI list. If SWAPI fails or returns no usable names on the first load, `fetchRandomData` returns `null` and `generateFallbackTasks` supplies the eight offline templates (no placeholders). A later failure leaves the missions already on screen. If none are left, that same failure fills the offline set. Custom missions go through `generateCustomTask` from `AddTodo`. Template eligibility is enforced in `taskGenerator` via `hasRequiredData`.
 
 ## Failure handling
 
 - **ErrorBoundary** catches render errors and offers reload / retry.
-- **SWAPI errors** on the first load use offline fallback missions. A failed New Missions leaves the current list in place.
+- **SWAPI errors** on the first load use offline fallback missions. A failed New Missions leaves the current list in place, or fills the offline set when that list is empty.
 - **Non-blocking notices:** when missions exist but SWAPI was unavailable, `state.error` carries a short notice while `TodoList` still renders the list (full-screen error UI only when there are zero missions).
 - **Status banner** in `App.tsx` repeats the same message below Mission Control for visibility.
 
