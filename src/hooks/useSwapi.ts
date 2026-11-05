@@ -29,7 +29,7 @@ export const useSwapi = () => {
   });
 
   // Function to fetch random data from all resource types
-  const fetchRandomData = useCallback(async () => {
+  const fetchRandomData = useCallback(async (): Promise<TemplateData | null> => {
     setState(prev => ({...prev, isLoading: true, error: null}));
 
     try {
@@ -59,7 +59,7 @@ export const useSwapi = () => {
         error: hasAnyNames ? null : 'No usable data returned from SWAPI',
       });
 
-      console.log('SWAPI data fetched successfully:', templateData);
+      return hasAnyNames ? templateData : null;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       setState(prev => ({
@@ -68,42 +68,15 @@ export const useSwapi = () => {
         error: errorMessage,
       }));
       console.error('Error fetching SWAPI data:', error);
+      return null;
     }
   }, []);
 
-  // Function to retry fetching data
-  const retry = useCallback(() => {
-    fetchRandomData();
-  }, [fetchRandomData]);
-
-  // Function to clear current data
-  const clearData = useCallback(() => {
-    setState({
-      data: {
-        people: [],
-        planets: [],
-        starships: [],
-        species: [],
-      },
-      isLoading: false,
-      error: null,
-    });
-  }, []);
-
   return {
-    // Current state
     data: state.data,
     isLoading: state.isLoading,
     error: state.error,
-
-    // Actions
     fetchRandomData,
-    retry,
-    clearData,
-
-    // Computed values
-    hasData: Object.values(state.data).some(arr => arr && arr.length > 0),
-    isEmpty: Object.values(state.data).every(arr => !arr || arr.length === 0),
   };
 };
 

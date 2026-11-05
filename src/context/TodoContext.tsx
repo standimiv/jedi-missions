@@ -4,7 +4,7 @@ import {Todo, AppState, TodoAction, TemplateData} from '../types/app';
 // Initial state
 const initialState: AppState = {
   todos: [],
-  isLoading: false,
+  isLoading: true,
   error: null,
   swapiData: {
     people: [],
@@ -59,7 +59,7 @@ const todoReducer = (state: AppState, action: TodoAction): AppState => {
       return {
         ...state,
         error: action.payload,
-        isLoading: false,
+        isLoading: action.payload ? false : state.isLoading,
       };
 
     case 'SET_SWAPI_DATA':
