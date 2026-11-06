@@ -259,13 +259,6 @@
   animation: lightsaber-slash 0.5s ease-in forwards;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .todo-item.force-completing,
-  .todo-item.lightsaber-deleting {
-    animation: none;
-  }
-}
-
 .sr-only {
   position: absolute;
   width: 1px;
@@ -761,4 +754,16 @@
     border: 0;
   }
 
+}
+
+/* After the 480px rules so equal-specificity animation declarations do not win. */
+@media (prefers-reduced-motion: reduce) {
+  .todo-item.force-completing,
+  .todo-item.lightsaber-deleting,
+  .todo-item.slide-in-new,
+  .todo-item:hover,
+  .complete-btn:hover,
+  .delete-btn:hover {
+    animation: none;
+  }
 }

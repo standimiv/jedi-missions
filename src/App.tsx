@@ -20,7 +20,7 @@ const AppContent: React.FC = () => {
 
   const applyFallback = useCallback(() => {
     if (missionCount.current > 0) {
-      setError('Using offline missions. Star Wars data unavailable.');
+      setError('Star Wars data unavailable. Current missions kept.');
       return;
     }
 

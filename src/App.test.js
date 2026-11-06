@@ -54,6 +54,20 @@ test('shows mission control when loaded', async () => {
   expect(await screen.findAllByRole('button', {name: /delete mission/i})).toHaveLength(10);
 });
 
+test('failed refresh keeps the current list', async () => {
+  render(<App />);
+  const before = await screen.findAllByRole('button', {name: /delete mission/i});
+
+  swapi.names = null;
+  act(() => {
+    screen.getByRole('button', {name: /new missions/i}).click();
+  });
+
+  expect(await screen.findByText(/current missions kept/i)).toBeInTheDocument();
+  expect(screen.getAllByRole('button', {name: /delete mission/i})).toHaveLength(before.length);
+  expect(screen.queryByText(/using offline missions/i)).not.toBeInTheDocument();
+});
+
 test('failed refresh fills offline missions when the list is empty', async () => {
   render(<App />);
 
