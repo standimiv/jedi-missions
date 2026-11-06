@@ -53,6 +53,24 @@ test('replacing missions keeps the journal', () => {
   expect(next.error).toBeNull();
 });
 
+test('edits only a custom mission', () => {
+  const custom = {...todo, id: 'custom', custom: true};
+  const added = todoReducer(emptyState(), {type: 'ADD_TODO', payload: custom});
+  const edited = todoReducer(added, {
+    type: 'UPDATE_TODO',
+    payload: {id: 'custom', text: '  Revised watch  ', difficulty: 'master'},
+  });
+  expect(edited.todos[0].text).toBe('Revised watch');
+  expect(edited.todos[0].difficulty).toBe('master');
+
+  const generated = todoReducer(emptyState(), {type: 'ADD_TODO', payload: todo});
+  const unchanged = todoReducer(generated, {
+    type: 'UPDATE_TODO',
+    payload: {id: 'task_1', text: 'Nope', difficulty: 'master'},
+  });
+  expect(unchanged.todos[0].text).toBe(todo.text);
+});
+
 test('saves a custom template once', () => {
   const template = {id: 't', text: 'Meditate', difficulty: 'knight'};
   const once = todoReducer(emptyState(), {type: 'ADD_TEMPLATE', payload: template});

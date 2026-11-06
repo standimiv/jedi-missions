@@ -20,6 +20,7 @@ test('round-trips missions and ignores corrupt storage', () => {
       completedAt: '2026-01-03T00:00:00.000Z',
     }],
     templates: [{id: 't', text: 'Meditate', difficulty: 'padawan'}],
+    swapiData: {people: ['Luke Skywalker'], planets: [], starships: [], species: []},
   });
 
   const loaded = loadPersisted();
@@ -27,7 +28,13 @@ test('round-trips missions and ignores corrupt storage', () => {
   expect(loaded.todos[0].text).toBe('Keep watch');
   expect(loaded.journal).toHaveLength(1);
   expect(loaded.templates[0].text).toBe('Meditate');
+  expect(loaded.swapiData.people).toEqual(['Luke Skywalker']);
 
   localStorage.setItem(STORAGE_KEY, '{');
-  expect(loadPersisted()).toEqual({todos: [], journal: [], templates: []});
+  expect(loadPersisted()).toEqual({
+    todos: [],
+    journal: [],
+    templates: [],
+    swapiData: {people: [], planets: [], starships: [], species: []},
+  });
 });

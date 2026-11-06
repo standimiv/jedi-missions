@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Todo} from '../types/app';
+import {TaskDifficulty, Todo} from '../types/app';
 import {useTodoContext} from '../context/TodoContext';
 import './TodoItem.css';
 
@@ -18,7 +18,10 @@ const motionDelay = (ms: number): number => {
 const TodoItem: React.FC<TodoItemProps> = ({todo}) => {
   const [isAnimating, setIsAnimating] = useState<'completing' | 'deleting' | null>(null);
   const [announcement, setAnnouncement] = useState('');
-  const {toggleTodo, deleteTodo} = useTodoContext();
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(todo.text);
+  const [draftDifficulty, setDraftDifficulty] = useState<TaskDifficulty>(todo.difficulty);
+  const {toggleTodo, deleteTodo, updateTodo} = useTodoContext();
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -96,9 +99,47 @@ const TodoItem: React.FC<TodoItemProps> = ({todo}) => {
 
       {/* Mission Content */}
       <div className="mission-content">
-        <div className="mission-text" id={`todo-text-${todo.id}`}>
-          {todo.text}
-        </div>
+        {editing ? (
+          <form
+            className="mission-edit"
+            onSubmit={(event) => {
+              event.preventDefault();
+              const text = draft.trim();
+              if (!text) {
+                return;
+              }
+              updateTodo(todo.id, text, draftDifficulty);
+              setEditing(false);
+            }}
+          >
+            <label className="sr-only" htmlFor={`edit-${todo.id}`}>Mission text</label>
+            <textarea
+              id={`edit-${todo.id}`}
+              value={draft}
+              maxLength={200}
+              rows={3}
+              onChange={(event) => setDraft(event.target.value)}
+            />
+            <label className="sr-only" htmlFor={`edit-difficulty-${todo.id}`}>Difficulty</label>
+            <select
+              id={`edit-difficulty-${todo.id}`}
+              value={draftDifficulty}
+              onChange={(event) => setDraftDifficulty(event.target.value as TaskDifficulty)}
+            >
+              <option value="padawan">Padawan</option>
+              <option value="knight">Knight</option>
+              <option value="master">Master</option>
+            </select>
+            <div className="mission-edit-actions">
+              <button type="button" onClick={() => setEditing(false)}>Cancel</button>
+              <button type="submit" disabled={!draft.trim()}>Save</button>
+            </div>
+          </form>
+        ) : (
+          <div className="mission-text" id={`todo-text-${todo.id}`}>
+            {todo.text}
+          </div>
+        )}
 
         {/* Mission Date */}
         <div className="mission-date" id={`todo-date-${todo.id}`}>
@@ -124,6 +165,23 @@ const TodoItem: React.FC<TodoItemProps> = ({todo}) => {
             {todo.completed ? 'Reopen' : 'Complete'}
           </span>
         </button>
+
+        {todo.custom && !editing && (
+          <button
+            type="button"
+            className="action-btn"
+            onClick={() => {
+              setDraft(todo.text);
+              setDraftDifficulty(todo.difficulty);
+              setEditing(true);
+            }}
+            aria-label={`Edit mission "${todo.text}"`}
+            disabled={isAnimating !== null}
+          >
+            <span className="btn-icon" aria-hidden="true">✏️</span>
+            <span className="btn-text">Edit</span>
+          </button>
+        )}
 
         <button
           className="action-btn delete-btn"

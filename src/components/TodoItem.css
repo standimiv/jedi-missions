@@ -767,3 +767,25 @@
     animation: none;
   }
 }
+
+.mission-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mission-edit textarea,
+.mission-edit select,
+.mission-edit button {
+  font: inherit;
+  color: var(--color-text-primary);
+  background: var(--color-dark-secondary);
+  border: 1px solid var(--color-dark-accent);
+  border-radius: var(--border-radius-md);
+  padding: 0.35rem 0.5rem;
+}
+
+.mission-edit-actions {
+  display: flex;
+  gap: 0.5rem;
+}

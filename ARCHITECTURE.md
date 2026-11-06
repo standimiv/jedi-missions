@@ -6,7 +6,7 @@ Jedi Missions is a single-user, in-browser mission list. It calls one public HTT
 
 ## Product
 
-On a first visit the app fetches random people, planets, starships, and species from [SWAPI.py4e](https://swapi.py4e.com/api), fills string templates, and shows about ten missions at padawan / knight / master difficulty. The user can complete, abandon, add a custom mission, or save that mission as a reusable template. Header rank and the lightsaber bar are derived from completion percentage. A later visit restores the saved list and does not call SWAPI until New Missions or Retry SWAPI.
+On a first visit the app fetches random people, planets, starships, and species from [SWAPI.py4e](https://swapi.py4e.com/api), fills string templates, and shows about ten missions at padawan / knight / master difficulty. The user can complete, abandon (with a short undo), add a custom mission, edit that custom mission, or save it as a reusable template. Header rank and the lightsaber bar are derived from completion percentage. A later visit restores the saved list and does not call SWAPI until New Missions or Retry SWAPI. Those buttons ask before replacing a list. The last SWAPI names are saved too, so a later offline refresh can still build missions. The whole save can be exported or imported as one JSON file.
 
 The npm package name is `jedi-missions`. The app is Create React App + React 19 + TypeScript. There is no backend, database, auth, or client-side router of our own.
 
@@ -49,7 +49,7 @@ Browser (SPA)
 
 `TodoProvider` holds `AppState`: `todos`, `journal`, `templates`, `isLoading`, `error`, `swapiData`. Mutations go through a reducer (`ADD_TODO`, `TOGGLE_TODO`, `DELETE_TODO`, `SET_TODOS`, `SET_LOADING`, `SET_ERROR`, `SET_SWAPI_DATA`, `ADD_TEMPLATE`, `DELETE_TEMPLATE`). Completing a mission appends one journal line. Reopening does not. Derived values (completed vs incomplete, counts by difficulty, completion percentage) live on the context value. Search, difficulty, and status filters stay in `TodoList`; they do not change stored missions.
 
-`useSwapi` holds fetch-specific loading, error, and raw name lists. `fetchRandomData` returns those names, or `null` when the request fails or no names are usable. `App.tsx` calls that on mount only when no missions are saved, and again from New Missions or Retry SWAPI, then writes generated missions into context. A failed refresh keeps the current list and shows the notice. Deleting every mission does not fetch again until the next empty load.
+`useSwapi` holds fetch-specific loading, error, and raw name lists. `fetchRandomData` returns those names, or `null` when the request fails or no names are usable. `App.tsx` calls that on mount only when no missions are saved, and again from New Missions or Retry SWAPI, then writes generated missions into context. If that fetch fails and saved names exist, missions are generated from those names. Otherwise a failed refresh keeps the current list, or fills the offline set when the list is empty. Deleting every mission does not fetch again until the next empty load. Abandon keeps the removed mission in memory for five seconds so it can be undone; that undo is not written to storage.
 
 ### SWAPI client
 
@@ -57,11 +57,11 @@ Browser (SPA)
 
 ### Mission generation
 
-`TASK_TEMPLATES` are strings with `{character}`, `{planet}`, `{starship}`, `{species}` placeholders and a `requiredData` list. Balanced generation targets ~40% padawan, ~40% knight, ~20% master. Each placeholder in a template is filled with a random name from the matching SWAPI list. If SWAPI fails or returns no usable names on the first load, `fetchRandomData` returns `null` and `generateFallbackTasks` supplies the eight offline templates (no placeholders). A later failure leaves the missions already on screen. If none are left, that same failure fills the offline set. Custom missions go through `generateCustomTask` from `AddTodo`. Template eligibility is enforced in `taskGenerator` via `hasRequiredData`.
+`TASK_TEMPLATES` are strings with `{character}`, `{planet}`, `{starship}`, `{species}` placeholders and a `requiredData` list. Balanced generation targets ~40% padawan, ~40% knight, ~20% master. Each placeholder in a template is filled with a random name from the matching SWAPI list. If SWAPI fails or returns no usable names and no names are saved, `fetchRandomData` returns `null` and `generateFallbackTasks` supplies the eight offline templates (no placeholders) when the list is empty. A later failure with saved names generates from those names. With no saved names it leaves the missions already on screen, or fills the offline set when none are left. Custom missions go through `generateCustomTask` from `AddTodo` and can be edited later. Template eligibility is enforced in `taskGenerator` via `hasRequiredData`.
 
 ## Browser storage
 
-One key, `jedi-missions-v1`, holds missions, the journal (last 40 completions), and up to 20 custom templates. `createdAt` is stored as JSON and turned back into a `Date` on load. Corrupt JSON is ignored and treated as an empty store, which then follows the normal first-visit fetch. Saving is skipped if `localStorage` throws. The SWAPI name cache stays in memory and is separate from this key.
+One key, `jedi-missions-v1`, holds missions, the journal (last 40 completions, shown by day), up to 20 custom templates, and the last SWAPI name lists. `createdAt` is stored as JSON and turned back into a `Date` on load. Corrupt JSON is ignored and treated as an empty store, which then follows the normal first-visit fetch. Saving is skipped if `localStorage` throws. The one-hour axios cache stays in memory and is separate from this key. Export writes this same object; import runs it through the same revive checks, then replaces the save.
 
 A production build registers `public/sw.js`, which caches same-origin assets for an offline shell. It does not cache SWAPI. Mission text still comes from storage or the offline templates.
 

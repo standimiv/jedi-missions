@@ -25,7 +25,16 @@ const Journal: React.FC<{entries: JournalEntry[]}> = ({entries}) => {
     return null;
   }
 
-  const recent = entries.slice(-8).reverse();
+  const days: {label: string; entries: JournalEntry[]}[] = [];
+  [...entries].reverse().forEach(entry => {
+    const label = new Date(entry.completedAt).toLocaleDateString();
+    const current = days[days.length - 1];
+    if (current && current.label === label) {
+      current.entries.push(entry);
+      return;
+    }
+    days.push({label, entries: [entry]});
+  });
 
   return (
     <section className="mission-journal" aria-labelledby="journal-heading">
@@ -33,19 +42,24 @@ const Journal: React.FC<{entries: JournalEntry[]}> = ({entries}) => {
         <span className="title-icon" aria-hidden="true">📖</span>
         Mission journal
       </h3>
-      <ul className="journal-list">
-        {recent.map(entry => (
-          <li key={entry.id}>
-            <time dateTime={entry.completedAt}>
-              {new Date(entry.completedAt).toLocaleString()}
-            </time>
-            <span className={`journal-difficulty difficulty-${entry.difficulty}`}>
-              {entry.difficulty}
-            </span>
-            <span>{entry.text}</span>
-          </li>
-        ))}
-      </ul>
+      {days.map(day => (
+        <section key={day.label} className="journal-day">
+          <h4>{day.label}</h4>
+          <ul className="journal-list">
+            {day.entries.map(entry => (
+              <li key={entry.id}>
+                <time dateTime={entry.completedAt}>
+                  {new Date(entry.completedAt).toLocaleTimeString()}
+                </time>
+                <span className={`journal-difficulty difficulty-${entry.difficulty}`}>
+                  {entry.difficulty}
+                </span>
+                <span>{entry.text}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
     </section>
   );
 };
@@ -77,6 +91,8 @@ const DifficultyStat: React.FC<{
 const TodoList: React.FC<TodoListProps> = ({onRetry}) => {
   const {
     state,
+    undoTodo,
+    undoDelete,
     incompleteTodos,
     completedTodos,
     totalTodos,
@@ -120,6 +136,12 @@ const TodoList: React.FC<TodoListProps> = ({onRetry}) => {
 
   return (
     <div className="todo-list-container" id="mission-list" tabIndex={-1} aria-label="Mission list">
+      {undoTodo && (
+        <div className="undo-bar" role="status">
+          <span>Abandoned: {undoTodo.text}</span>
+          <button type="button" onClick={undoDelete}>Undo</button>
+        </div>
+      )}
       {state.error && totalTodos === 0 ? (
         <div className="error-state">
           <h3>Disturbance in the Force</h3>

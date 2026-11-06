@@ -8,6 +8,7 @@ export interface Todo {
   completed: boolean;
   difficulty: TaskDifficulty;
   createdAt: Date;
+  custom?: boolean;
 }
 
 // One line written when a mission is completed
@@ -63,5 +64,7 @@ export type TodoAction =
   | {type: 'SET_LOADING'; payload: boolean}
   | {type: 'SET_ERROR'; payload: string | null}
   | {type: 'SET_SWAPI_DATA'; payload: TemplateData}
+  | {type: 'UPDATE_TODO'; payload: {id: string; text: string; difficulty: TaskDifficulty}}
   | {type: 'ADD_TEMPLATE'; payload: MissionTemplate}
-  | {type: 'DELETE_TEMPLATE'; payload: string};
+  | {type: 'DELETE_TEMPLATE'; payload: string}
+  | {type: 'RESTORE'; payload: {todos: Todo[]; journal: JournalEntry[]; templates: MissionTemplate[]; swapiData: TemplateData}};

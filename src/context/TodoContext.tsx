@@ -1,13 +1,6 @@
-import React, {createContext, useContext, useReducer, ReactNode, useMemo, useCallback, useEffect} from 'react';
-import {Todo, AppState, TodoAction, TemplateData, MissionTemplate} from '../types/app';
-import {loadPersisted, savePersisted} from '../utils/storage';
-
-const emptySwapiData: TemplateData = {
-  people: [],
-  planets: [],
-  starships: [],
-  species: [],
-};
+import React, {createContext, useContext, useReducer, ReactNode, useMemo, useCallback, useEffect, useRef, useState} from 'react';
+import {Todo, AppState, TodoAction, TemplateData, MissionTemplate, TaskDifficulty} from '../types/app';
+import {loadPersisted, PersistedState, savePersisted} from '../utils/storage';
 
 // Initial state. Saved missions skip the loading screen; an empty store still fetches.
 const createInitialState = (): AppState => {
@@ -16,7 +9,7 @@ const createInitialState = (): AppState => {
     todos: persisted.todos,
     isLoading: persisted.todos.length === 0,
     error: null,
-    swapiData: emptySwapiData,
+    swapiData: persisted.swapiData,
     journal: persisted.journal,
     templates: persisted.templates,
   };
@@ -74,6 +67,32 @@ export const todoReducer = (state: AppState, action: TodoAction): AppState => {
         error: null,
       };
 
+    case 'UPDATE_TODO': {
+      const text = action.payload.text.trim().slice(0, 200);
+      if (!text) {
+        return state;
+      }
+      return {
+        ...state,
+        todos: state.todos.map(todo =>
+          todo.id === action.payload.id && todo.custom
+            ? {...todo, text, difficulty: action.payload.difficulty}
+            : todo
+        ),
+      };
+    }
+
+    case 'RESTORE':
+      return {
+        ...state,
+        todos: action.payload.todos,
+        journal: action.payload.journal.slice(-40),
+        templates: action.payload.templates.slice(0, 20),
+        swapiData: action.payload.swapiData,
+        error: null,
+        isLoading: false,
+      };
+
     case 'SET_LOADING':
       return {
         ...state,
@@ -127,6 +146,10 @@ interface TodoContextType {
   addTodo: (todo: Todo) => void;
   toggleTodo: (id: string) => void;
   deleteTodo: (id: string) => void;
+  updateTodo: (id: string, text: string, difficulty: TaskDifficulty) => void;
+  undoDelete: () => void;
+  undoTodo: Todo | null;
+  restoreSave: (saved: PersistedState) => void;
   setTodos: (todos: Todo[]) => void;
 
   // App state actions
@@ -168,13 +191,30 @@ interface TodoProviderProps {
 export const TodoProvider: React.FC<TodoProviderProps> = ({children}) => {
   const [state, dispatch] = useReducer(todoReducer, undefined, createInitialState);
 
+  const [undoTodo, setUndoTodo] = useState<Todo | null>(null);
+  const undoRef = useRef<Todo | null>(null);
+  const todosRef = useRef(state.todos);
+  todosRef.current = state.todos;
+
   useEffect(() => {
     savePersisted({
       todos: state.todos,
       journal: state.journal,
       templates: state.templates,
+      swapiData: state.swapiData,
     });
-  }, [state.todos, state.journal, state.templates]);
+  }, [state.todos, state.journal, state.templates, state.swapiData]);
+
+  useEffect(() => {
+    if (!undoTodo) {
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      undoRef.current = null;
+      setUndoTodo(null);
+    }, 5000);
+    return () => window.clearTimeout(timer);
+  }, [undoTodo]);
 
   // Action creators (wrapped with useCallback for performance)
   const addTodo = useCallback((todo: Todo) => {
@@ -186,10 +226,34 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({children}) => {
   }, []);
 
   const deleteTodo = useCallback((id: string) => {
+    const todo = todosRef.current.find(item => item.id === id) ?? null;
+    undoRef.current = todo;
+    setUndoTodo(todo);
     dispatch({type: 'DELETE_TODO', payload: id});
   }, []);
 
+  const updateTodo = useCallback((id: string, text: string, difficulty: TaskDifficulty) => {
+    dispatch({type: 'UPDATE_TODO', payload: {id, text, difficulty}});
+  }, []);
+
+  const undoDelete = useCallback(() => {
+    const todo = undoRef.current;
+    undoRef.current = null;
+    setUndoTodo(null);
+    if (todo) {
+      dispatch({type: 'ADD_TODO', payload: todo});
+    }
+  }, []);
+
+  const restoreSave = useCallback((saved: PersistedState) => {
+    undoRef.current = null;
+    setUndoTodo(null);
+    dispatch({type: 'RESTORE', payload: saved});
+  }, []);
+
   const setTodos = useCallback((todos: Todo[]) => {
+    undoRef.current = null;
+    setUndoTodo(null);
     dispatch({type: 'SET_TODOS', payload: todos});
   }, []);
 
@@ -253,6 +317,10 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({children}) => {
     addTodo,
     toggleTodo,
     deleteTodo,
+    updateTodo,
+    undoDelete,
+    undoTodo,
+    restoreSave,
     setTodos,
     setLoading,
     setError,
@@ -272,6 +340,10 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({children}) => {
     addTodo,
     toggleTodo,
     deleteTodo,
+    updateTodo,
+    undoDelete,
+    undoTodo,
+    restoreSave,
     setTodos,
     setLoading,
     setError,

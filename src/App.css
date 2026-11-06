@@ -136,6 +136,13 @@
   cursor: not-allowed;
 }
 
+.save-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
 .status-icon {
   font-size: var(--font-size-lg);
 }

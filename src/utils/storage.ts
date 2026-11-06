@@ -1,4 +1,4 @@
-import {JournalEntry, MissionTemplate, TaskDifficulty, Todo} from '../types/app';
+import {JournalEntry, MissionTemplate, TaskDifficulty, TemplateData, Todo} from '../types/app';
 
 export const STORAGE_KEY = 'jedi-missions-v1';
 
@@ -6,13 +6,22 @@ export interface PersistedState {
   todos: Todo[];
   journal: JournalEntry[];
   templates: MissionTemplate[];
+  swapiData: TemplateData;
 }
 
-const EMPTY: PersistedState = {
+const emptySwapiData = (): TemplateData => ({
+  people: [],
+  planets: [],
+  starships: [],
+  species: [],
+});
+
+const emptyPersisted = (): PersistedState => ({
   todos: [],
   journal: [],
   templates: [],
-};
+  swapiData: emptySwapiData(),
+});
 
 const DIFFICULTIES: TaskDifficulty[] = ['padawan', 'knight', 'master'];
 
@@ -37,8 +46,32 @@ const reviveTodo = (value: unknown): Todo | null => {
     completed: Boolean(raw.completed),
     difficulty: raw.difficulty,
     createdAt,
+    ...(raw.custom === true ? {custom: true} : {}),
   };
 };
+
+const reviveNames = (value: unknown): string[] => {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+  return value
+    .filter((name): name is string => typeof name === 'string' && name.trim().length > 0)
+    .map(name => name.trim().slice(0, 80))
+    .slice(0, 30);
+};
+
+export const reviveSwapiData = (value: unknown): TemplateData => {
+  const raw = value && typeof value === 'object' ? value as TemplateData : {};
+  return {
+    people: reviveNames(raw.people),
+    planets: reviveNames(raw.planets),
+    starships: reviveNames(raw.starships),
+    species: reviveNames(raw.species),
+  };
+};
+
+export const hasSwapiNames = (data: TemplateData): boolean =>
+  [data.people, data.planets, data.starships, data.species].some(names => names && names.length > 0);
 
 const reviveJournal = (value: unknown): JournalEntry | null => {
   if (!value || typeof value !== 'object') {
@@ -73,26 +106,40 @@ const reviveTemplate = (value: unknown): MissionTemplate | null => {
   return {id: raw.id, text: raw.text.trim(), difficulty: raw.difficulty};
 };
 
+const reviveState = (parsed: Partial<PersistedState>): PersistedState => ({
+  todos: Array.isArray(parsed.todos)
+    ? parsed.todos.map(reviveTodo).filter((todo): todo is Todo => todo !== null)
+    : [],
+  journal: Array.isArray(parsed.journal)
+    ? parsed.journal.map(reviveJournal).filter((entry): entry is JournalEntry => entry !== null).slice(-40)
+    : [],
+  templates: Array.isArray(parsed.templates)
+    ? parsed.templates.map(reviveTemplate).filter((template): template is MissionTemplate => template !== null).slice(0, 20)
+    : [],
+  swapiData: reviveSwapiData(parsed.swapiData),
+});
+
+export const parsePersisted = (raw: string): PersistedState | null => {
+  try {
+    const parsed = JSON.parse(raw) as Partial<PersistedState>;
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      return null;
+    }
+    return reviveState(parsed);
+  } catch {
+    return null;
+  }
+};
+
 export const loadPersisted = (): PersistedState => {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-      return EMPTY;
+      return emptyPersisted();
     }
-    const parsed = JSON.parse(raw) as Partial<PersistedState>;
-    return {
-      todos: Array.isArray(parsed.todos)
-        ? parsed.todos.map(reviveTodo).filter((todo): todo is Todo => todo !== null)
-        : [],
-      journal: Array.isArray(parsed.journal)
-        ? parsed.journal.map(reviveJournal).filter((entry): entry is JournalEntry => entry !== null)
-        : [],
-      templates: Array.isArray(parsed.templates)
-        ? parsed.templates.map(reviveTemplate).filter((template): template is MissionTemplate => template !== null)
-        : [],
-    };
+    return parsePersisted(raw) ?? emptyPersisted();
   } catch {
-    return EMPTY;
+    return emptyPersisted();
   }
 };
 

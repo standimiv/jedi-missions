@@ -197,6 +197,7 @@ export const generateCustomTask = (text: string, difficulty: 'padawan' | 'knight
     completed: false,
     difficulty,
     createdAt: new Date(),
+    custom: true,
   };
 };
 
