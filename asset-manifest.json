@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/jedi-missions/static/css/main.dc95d7b4.css",
+    "main.js": "/jedi-missions/static/js/main.0b899a83.js",
+    "static/js/453.228c86cb.chunk.js": "/jedi-missions/static/js/453.228c86cb.chunk.js",
+    "index.html": "/jedi-missions/index.html",
+    "main.dc95d7b4.css.map": "/jedi-missions/static/css/main.dc95d7b4.css.map",
+    "main.0b899a83.js.map": "/jedi-missions/static/js/main.0b899a83.js.map",
+    "453.228c86cb.chunk.js.map": "/jedi-missions/static/js/453.228c86cb.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.dc95d7b4.css",
+    "static/js/main.0b899a83.js"
+  ]
+}
