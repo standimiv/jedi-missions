@@ -19,6 +19,7 @@ const AppContent: React.FC = () => {
   const skipInitialFetch = useRef(state.todos.length > 0);
   const fileRef = useRef<HTMLInputElement>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [importError, setImportError] = useState<string | null>(null);
   missionCount.current = state.todos.length;
   swapiDataRef.current = state.swapiData;
 
@@ -58,6 +59,7 @@ const AppContent: React.FC = () => {
     const id = ++requestId.current;
     setError(null);
     setNotice(null);
+    setImportError(null);
     setLoading(true);
 
     try {
@@ -97,7 +99,7 @@ const AppContent: React.FC = () => {
         setLoading(false);
       }
     }
-  }, [applyFallback, fetchRandomData, setError, setLoading, setSwapiData, setTodos, applySavedNamesOrFallback]);
+  }, [applyFallback, fetchRandomData, setError, setImportError, setLoading, setSwapiData, setTodos, applySavedNamesOrFallback]);
 
   const requestNewMissions = () => {
     if (state.todos.length > 0 && !window.confirm('Replace the current missions? Your journal and templates stay.')) {
@@ -124,14 +126,17 @@ const AppContent: React.FC = () => {
   const importSave = async (file: File) => {
     const parsed = parsePersisted(await file.text());
     if (!parsed) {
-      setError('That file is not a Jedi Missions save.');
+      setImportError('That file is not a Jedi Missions save.');
       return;
     }
     if (!window.confirm('Replace your missions, journal, and templates with this file?')) {
       return;
     }
+    // Drop a SWAPI load that is still in flight so it cannot replace this save.
+    requestId.current += 1;
     restoreSave(parsed);
     setNotice(null);
+    setImportError(null);
   };
 
   useEffect(() => {
@@ -166,7 +171,12 @@ const AppContent: React.FC = () => {
             <button type="button" className="status-retry" onClick={exportSave}>
               Export save
             </button>
-            <button type="button" className="status-retry" onClick={() => fileRef.current?.click()}>
+            <button
+              type="button"
+              className="status-retry"
+              onClick={() => fileRef.current?.click()}
+              disabled={state.isLoading}
+            >
               Import save
             </button>
             <input
@@ -192,6 +202,12 @@ const AppContent: React.FC = () => {
         </div>
 
         {/* Status Information */}
+        {importError && (
+          <div className="status-message error" role="status">
+            <span className="status-icon">⚠️</span>
+            <span>{importError}</span>
+          </div>
+        )}
         {state.error && (
           <div className="status-message error" role="status">
             <span className="status-icon">⚠️</span>

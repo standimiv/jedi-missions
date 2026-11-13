@@ -139,8 +139,13 @@
 .save-actions {
   display: flex;
   flex-wrap: wrap;
+  justify-content: flex-end;
   gap: var(--spacing-sm);
   margin-top: var(--spacing-md);
+}
+
+.save-actions .status-retry {
+  margin-left: 0;
 }
 
 .status-icon {

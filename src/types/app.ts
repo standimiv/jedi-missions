@@ -58,7 +58,7 @@ export interface AppState {
 // Actions for todo management
 export type TodoAction =
   | {type: 'ADD_TODO'; payload: Todo}
-  | {type: 'TOGGLE_TODO'; payload: string}
+  | {type: 'TOGGLE_TODO'; payload: {id: string; journalEntry?: JournalEntry}}
   | {type: 'DELETE_TODO'; payload: string}
   | {type: 'SET_TODOS'; payload: Todo[]}
   | {type: 'SET_LOADING'; payload: boolean}

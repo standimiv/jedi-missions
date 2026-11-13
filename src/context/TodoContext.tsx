@@ -36,25 +36,18 @@ export const todoReducer = (state: AppState, action: TodoAction): AppState => {
       };
 
     case 'TOGGLE_TODO': {
-      const target = state.todos.find(todo => todo.id === action.payload);
+      const {id, journalEntry} = action.payload;
+      const target = state.todos.find(todo => todo.id === id);
       const completedNow = Boolean(target && !target.completed);
       return {
         ...state,
         todos: state.todos.map(todo =>
-          todo.id === action.payload
+          todo.id === id
             ? {...todo, completed: !todo.completed}
             : todo
         ),
-        journal: completedNow && target
-          ? [
-            ...state.journal,
-            {
-              id: nextId('journal'),
-              text: target.text,
-              difficulty: target.difficulty,
-              completedAt: new Date().toISOString(),
-            },
-          ].slice(-40)
+        journal: completedNow && journalEntry
+          ? [...state.journal, journalEntry].slice(-40)
           : state.journal,
         error: null,
       };
@@ -222,7 +215,21 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({children}) => {
   }, []);
 
   const toggleTodo = useCallback((id: string) => {
-    dispatch({type: 'TOGGLE_TODO', payload: id});
+    const todo = todosRef.current.find(item => item.id === id);
+    dispatch({
+      type: 'TOGGLE_TODO',
+      payload: {
+        id,
+        journalEntry: todo && !todo.completed
+          ? {
+            id: nextId('journal'),
+            text: todo.text,
+            difficulty: todo.difficulty,
+            completedAt: new Date().toISOString(),
+          }
+          : undefined,
+      },
+    });
   }, []);
 
   const deleteTodo = useCallback((id: string) => {

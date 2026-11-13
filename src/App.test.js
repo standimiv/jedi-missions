@@ -1,8 +1,9 @@
-import {act, render, screen} from '@testing-library/react';
+import {act, fireEvent, render, screen} from '@testing-library/react';
 import App from './App';
 
 const swapi = {
   calls: 0,
+  gate: null,
   names: {
     people: ['Luke Skywalker'],
     planets: ['Tatooine'],
@@ -14,7 +15,7 @@ const swapi = {
 jest.mock('./hooks/useSwapi', () => {
   const fetchRandomData = () => {
     swapi.calls += 1;
-    return Promise.resolve(swapi.names);
+    return swapi.gate || Promise.resolve(swapi.names);
   };
 
   return {
@@ -39,6 +40,7 @@ const liveNames = {
 beforeEach(() => {
   localStorage.clear();
   swapi.calls = 0;
+  swapi.gate = null;
   swapi.names = liveNames;
   window.confirm = () => true;
 });
@@ -159,6 +161,68 @@ test('undo puts an abandoned mission back', async () => {
   act(() => {
     undo.click();
   });
+  expect(screen.getByText('Hold the line')).toBeInTheDocument();
+});
+
+test('an in-flight load does not replace an imported save', async () => {
+  let releaseFetch;
+  swapi.gate = new Promise((resolve) => {
+    releaseFetch = resolve;
+  });
+  render(<App />);
+  expect(screen.getByRole('button', {name: /import save/i})).toBeDisabled();
+
+  const input = screen.getByLabelText(/import save file/i);
+  const contents = JSON.stringify({
+    todos: [{
+      id: 'imported',
+      text: 'Imported mission',
+      completed: false,
+      difficulty: 'padawan',
+      createdAt: '2026-01-01T00:00:00.000Z',
+    }],
+    journal: [],
+    templates: [],
+  });
+  const file = new File([contents], 'jedi-missions.json', {type: 'application/json'});
+  file.text = () => Promise.resolve(contents);
+
+  await act(async () => {
+    fireEvent.change(input, {target: {files: [file]}});
+  });
+  expect(await screen.findByText('Imported mission')).toBeInTheDocument();
+
+  await act(async () => {
+    releaseFetch(liveNames);
+  });
+  expect(screen.getByText('Imported mission')).toBeInTheDocument();
+  expect(screen.queryByText(/Luke Skywalker|Tatooine|X-wing|Human/)).not.toBeInTheDocument();
+});
+
+test('a bad import file does not offer Retry SWAPI', async () => {
+  localStorage.setItem('jedi-missions-v1', JSON.stringify({
+    todos: [{
+      id: 'kept',
+      text: 'Hold the line',
+      completed: false,
+      difficulty: 'knight',
+      createdAt: '2026-01-01T00:00:00.000Z',
+    }],
+    journal: [],
+    templates: [],
+  }));
+  render(<App />);
+  expect(await screen.findByText('Hold the line')).toBeInTheDocument();
+
+  const input = screen.getByLabelText(/import save file/i);
+  const file = new File(['not json'], 'notes.txt', {type: 'text/plain'});
+  file.text = () => Promise.resolve('not json');
+  await act(async () => {
+    fireEvent.change(input, {target: {files: [file]}});
+  });
+
+  expect(await screen.findByText(/not a jedi missions save/i)).toBeInTheDocument();
+  expect(screen.queryByRole('button', {name: /retry swapi/i})).not.toBeInTheDocument();
   expect(screen.getByText('Hold the line')).toBeInTheDocument();
 });
 

@@ -119,10 +119,36 @@ const reviveState = (parsed: Partial<PersistedState>): PersistedState => ({
   swapiData: reviveSwapiData(parsed.swapiData),
 });
 
+const isSaveFile = (value: object): value is Partial<PersistedState> => {
+  const record = value as Record<string, unknown>;
+  const knownKeys = ['todos', 'journal', 'templates', 'swapiData'].filter(key =>
+    Object.prototype.hasOwnProperty.call(record, key)
+  );
+  if (knownKeys.length === 0) {
+    return false;
+  }
+  if ('todos' in record && !Array.isArray(record.todos)) {
+    return false;
+  }
+  if ('journal' in record && !Array.isArray(record.journal)) {
+    return false;
+  }
+  if ('templates' in record && !Array.isArray(record.templates)) {
+    return false;
+  }
+  if ('swapiData' in record) {
+    const data = record.swapiData;
+    if (!data || typeof data !== 'object' || Array.isArray(data)) {
+      return false;
+    }
+  }
+  return true;
+};
+
 export const parsePersisted = (raw: string): PersistedState | null => {
   try {
-    const parsed = JSON.parse(raw) as Partial<PersistedState>;
-    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    const parsed = JSON.parse(raw) as unknown;
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed) || !isSaveFile(parsed)) {
       return null;
     }
     return reviveState(parsed);

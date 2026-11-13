@@ -22,12 +22,27 @@ test('add, complete once, and delete', () => {
   expect(added.todos).toHaveLength(1);
   expect(added.error).toBeNull();
 
-  const completed = todoReducer(added, {type: 'TOGGLE_TODO', payload: 'task_1'});
+  const completed = todoReducer(added, {
+    type: 'TOGGLE_TODO',
+    payload: {
+      id: 'task_1',
+      journalEntry: {
+        id: 'journal_1',
+        text: todo.text,
+        difficulty: 'padawan',
+        completedAt: '2026-01-02T00:00:00.000Z',
+      },
+    },
+  });
   expect(completed.todos[0].completed).toBe(true);
-  expect(completed.journal).toHaveLength(1);
-  expect(completed.journal[0].text).toBe(todo.text);
+  expect(completed.journal).toEqual([{
+    id: 'journal_1',
+    text: todo.text,
+    difficulty: 'padawan',
+    completedAt: '2026-01-02T00:00:00.000Z',
+  }]);
 
-  const reopened = todoReducer(completed, {type: 'TOGGLE_TODO', payload: 'task_1'});
+  const reopened = todoReducer(completed, {type: 'TOGGLE_TODO', payload: {id: 'task_1'}});
   expect(reopened.todos[0].completed).toBe(false);
   expect(reopened.journal).toHaveLength(1);
 

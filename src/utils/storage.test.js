@@ -1,4 +1,4 @@
-import {STORAGE_KEY, loadPersisted, savePersisted} from './storage';
+import {STORAGE_KEY, loadPersisted, parsePersisted, savePersisted} from './storage';
 
 beforeEach(() => {
   localStorage.clear();
@@ -29,6 +29,8 @@ test('round-trips missions and ignores corrupt storage', () => {
   expect(loaded.journal).toHaveLength(1);
   expect(loaded.templates[0].text).toBe('Meditate');
   expect(loaded.swapiData.people).toEqual(['Luke Skywalker']);
+
+  expect(parsePersisted(JSON.stringify({name: 'jedi-missions', version: '0.1.0'}))).toBeNull();
 
   localStorage.setItem(STORAGE_KEY, '{');
   expect(loadPersisted()).toEqual({
