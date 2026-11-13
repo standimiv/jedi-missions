@@ -1,0 +1,41 @@
+.difficulty-mark {
+  display: inline-flex;
+  align-items: center;
+  width: 2.25rem;
+  height: 0.75rem;
+  flex-shrink: 0;
+}
+
+.difficulty-mark-hilt {
+  width: 0.45rem;
+  height: 0.55rem;
+  border-radius: 1px;
+  background: linear-gradient(#4a4a4a, #1a1a1a);
+  border: 1px solid #666;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.difficulty-mark-blade {
+  flex: 1;
+  height: 3px;
+  margin-left: 1px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #ffffff, currentColor);
+  box-shadow: 0 0 6px currentColor;
+}
+
+.difficulty-mark-padawan {
+  color: var(--color-padawan);
+}
+
+.difficulty-mark-knight {
+  color: var(--color-knight);
+}
+
+.difficulty-mark-master {
+  color: var(--color-master);
+}
+
+.difficulty-mark-unknown {
+  color: var(--color-text-muted);
+}

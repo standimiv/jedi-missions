@@ -1,7 +1,36 @@
-import React from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {useTodoContext} from '../context/TodoContext';
 import StarField from './StarField';
 import './AppLayout.css';
+
+type RankId = 'youngling' | 'padawan' | 'knight' | 'master';
+
+const RANK_LABEL: Record<RankId, string> = {
+  youngling: 'Youngling',
+  padawan: 'Padawan',
+  knight: 'Jedi Knight',
+  master: 'Jedi Master',
+};
+
+const RANK_ACCENT: Record<RankId, string> = {
+  youngling: '#4a90e2',
+  padawan: '#4a90e2',
+  knight: '#ff4500',
+  master: '#dc143c',
+};
+
+const rankFromCompletion = (completionPercentage: number): RankId => {
+  if (completionPercentage === 100) {
+    return 'master';
+  }
+  if (completionPercentage >= 75) {
+    return 'knight';
+  }
+  if (completionPercentage >= 25) {
+    return 'padawan';
+  }
+  return 'youngling';
+};
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -9,10 +38,25 @@ interface AppLayoutProps {
 
 const AppLayout: React.FC<AppLayoutProps> = ({children}) => {
   const {completionPercentage, totalTodos, completedTodos} = useTodoContext();
+  const rank = rankFromCompletion(completionPercentage);
+  const previousRank = useRef(rank);
+  const [rankPulse, setRankPulse] = useState(false);
+
+  useEffect(() => {
+    if (previousRank.current === rank) {
+      return;
+    }
+    previousRank.current = rank;
+    setRankPulse(true);
+    const reduceMotion = typeof window.matchMedia === 'function'
+      && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const timer = window.setTimeout(() => setRankPulse(false), reduceMotion ? 0 : 700);
+    return () => window.clearTimeout(timer);
+  }, [rank]);
 
   return (
     <div className="app-layout">
-      <StarField />
+      <StarField accent={RANK_ACCENT[rank]} />
 
       {/* Header */}
       <header className="app-header">
@@ -26,10 +70,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({children}) => {
             <span className="status-text">
               {completedTodos.length} of {totalTodos} missions completed
             </span>
-            <div className="rank-indicator">
-              {completionPercentage === 100 ? 'Jedi Master' :
-                completionPercentage >= 75 ? 'Jedi Knight' :
-                  completionPercentage >= 25 ? 'Padawan' : 'Youngling'}
+            <div className={`rank-indicator rank-${rank}${rankPulse ? ' rank-pulse' : ''}`}>
+              {RANK_LABEL[rank]}
             </div>
           </div>
         </div>

@@ -120,7 +120,7 @@ const TodoList: React.FC<TodoListProps> = ({onRetry}) => {
         <Loading
           message="Consulting the Force for your missions..."
           size="large"
-          variant="force"
+          variant="lightsaber"
         />
       </div>
     );

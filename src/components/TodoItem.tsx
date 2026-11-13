@@ -1,6 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {TaskDifficulty, Todo} from '../types/app';
 import {useTodoContext} from '../context/TodoContext';
+import DifficultyMark from './DifficultyMark';
 import './TodoItem.css';
 
 interface TodoItemProps {
@@ -58,19 +59,6 @@ const TodoItem: React.FC<TodoItemProps> = ({todo}) => {
     }, motionDelay(500));
   };
 
-  const getDifficultyIcon = (difficulty: string) => {
-    switch (difficulty) {
-      case 'padawan':
-        return '🌟';
-      case 'knight':
-        return '⚔️';
-      case 'master':
-        return '🔥';
-      default:
-        return '📋';
-    }
-  };
-
   const getDifficultyLabel = (difficulty: string) => {
     switch (difficulty) {
       case 'padawan':
@@ -91,9 +79,11 @@ const TodoItem: React.FC<TodoItemProps> = ({todo}) => {
       aria-labelledby={`todo-text-${todo.id}`}
       aria-describedby={`todo-difficulty-${todo.id} todo-date-${todo.id}`}
     >
+      <span className="completion-flash" aria-hidden="true" />
+
       {/* Difficulty Badge */}
       <div className="difficulty-badge" id={`todo-difficulty-${todo.id}`}>
-        <span className="difficulty-icon" aria-hidden="true">{getDifficultyIcon(todo.difficulty)}</span>
+        <DifficultyMark difficulty={todo.difficulty} />
         <span className="difficulty-label">{getDifficultyLabel(todo.difficulty)} Level</span>
       </div>
 

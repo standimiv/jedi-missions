@@ -38,8 +38,47 @@
 }
 
 .todo-item.completed .mission-text {
-  text-decoration: line-through;
   color: var(--color-text-muted);
+}
+
+.completion-flash {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 4px;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+  background: #ffffff;
+  box-shadow:
+    0 0 10px var(--color-sith-yellow),
+    0 0 18px var(--color-sith-red);
+}
+
+.todo-item.force-completing .completion-flash {
+  animation: completion-blade 0.6s ease-out;
+}
+
+@keyframes completion-blade {
+  0% {
+    opacity: 0;
+    top: 50%;
+    height: 0;
+  }
+
+  35% {
+    opacity: 1;
+    top: 0;
+    height: 100%;
+    width: 6px;
+  }
+
+  100% {
+    opacity: 0;
+    top: 0;
+    height: 100%;
+    width: 4px;
+  }
 }
 
 /* Difficulty Badge */
@@ -759,6 +798,7 @@
 /* After the 480px rules so equal-specificity animation declarations do not win. */
 @media (prefers-reduced-motion: reduce) {
   .todo-item.force-completing,
+  .todo-item.force-completing .completion-flash,
   .todo-item.lightsaber-deleting,
   .todo-item.slide-in-new,
   .todo-item:hover,

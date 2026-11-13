@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {useTodoContext} from '../context/TodoContext';
+import DifficultyMark from './DifficultyMark';
 import {generateCustomTask, generateTaskId} from '../utils/taskGenerator';
 import {TaskDifficulty} from '../types/app';
 import './AddTodo.css';
@@ -58,17 +59,6 @@ const AddTodo: React.FC = () => {
     setDifficulty(nextDifficulty);
     setIsExpanded(true);
     setTemplateMessage('');
-  };
-
-  const getDifficultyIcon = (diff: TaskDifficulty) => {
-    switch (diff) {
-      case 'padawan':
-        return '🌟';
-      case 'knight':
-        return '⚔️';
-      case 'master':
-        return '🔥';
-    }
   };
 
   const getDifficultyDescription = (diff: TaskDifficulty) => {
@@ -166,7 +156,7 @@ const AddTodo: React.FC = () => {
                 />
                 <div className={`difficulty-card ${difficulty === diff ? 'selected' : ''}`}>
                   <div className="difficulty-header">
-                    <span className="difficulty-icon">{getDifficultyIcon(diff)}</span>
+                    <DifficultyMark difficulty={diff} />
                     <span className="difficulty-name">{diff.charAt(0).toUpperCase() + diff.slice(1)}</span>
                   </div>
                   <div className="difficulty-description">

@@ -6,7 +6,7 @@ Jedi Missions is a single-user, in-browser mission list. It calls one public HTT
 
 ## Product
 
-On a first visit the app fetches random people, planets, starships, and species from [SWAPI.py4e](https://swapi.py4e.com/api), fills string templates, and shows about ten missions at padawan / knight / master difficulty. The user can complete, abandon (with a short undo), add a custom mission, edit that custom mission, or save it as a reusable template. Header rank and the lightsaber bar are derived from completion percentage. A later visit restores the saved list and does not call SWAPI until New Missions or Retry SWAPI. Those buttons ask before replacing a list. The last SWAPI names are saved too, so a later offline refresh can still build missions. The whole save can be exported or imported as one JSON file.
+On a first visit the app fetches random people, planets, starships, and species from [SWAPI.py4e](https://swapi.py4e.com/api), fills string templates, and shows about ten missions at padawan / knight / master difficulty. The user can complete, abandon (with a short undo), add a custom mission, edit that custom mission, or save it as a reusable template. Header rank and the lightsaber bar are derived from completion percentage. Rank color uses the same thresholds as the labels: blue below 75%, orange from 75%, and red at 100%, with a short pulse when the rank changes. The starfield tints some stars, and an occasional streak, to that color. Mission generation shows the lightsaber loader. Completing a mission flashes a blade along the card; the settled card is dimmed and the mission text is not struck through. Difficulty marks on cards and the custom form are drawn in CSS. Headings use self-hosted Orbitron. A later visit restores the saved list and does not call SWAPI until New Missions or Retry SWAPI. Those buttons ask before replacing a list. The last SWAPI names are saved too, so a later offline refresh can still build missions. The whole save can be exported or imported as one JSON file.
 
 The npm package name is `jedi-missions`. The app is Create React App + React 19 + TypeScript. There is no backend, database, auth, or client-side router of our own.
 
@@ -39,7 +39,7 @@ Browser (SPA)
 | Layer | Files | Responsibility |
 | --- | --- | --- |
 | Shell | `src/index.tsx`, `src/App.tsx`, `src/components/ErrorBoundary.tsx` | Mount, StrictMode, catch render failures |
-| Presentation | `AppLayout`, `TodoList`, `TodoItem`, `AddTodo`, `Loading`, `StarField` | Theme, mission list, custom form, progress chrome |
+| Presentation | `AppLayout`, `TodoList`, `TodoItem`, `AddTodo`, `DifficultyMark`, `Loading`, `StarField` | Theme, mission list, custom form, progress chrome |
 | App state | `src/context/TodoContext.tsx`, `src/types/app.ts` | Todos, journal, templates, loading, error, SWAPI name bags; derived stats |
 | Browser storage | `src/utils/storage.ts` | One `localStorage` key; revives `createdAt` |
 | Integration | `src/hooks/useSwapi.ts`, `src/utils/swapiClient.ts`, `src/types/swapi.ts` | Parallel random fetches, axios, cache |

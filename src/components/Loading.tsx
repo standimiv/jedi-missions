@@ -10,7 +10,7 @@ interface LoadingProps {
 const Loading: React.FC<LoadingProps> = ({
   message = 'Consulting the Force...',
   size = 'medium',
-  variant = 'spinner'
+  variant = 'lightsaber'
 }) => {
   const renderSpinner = () => (
     <div className={`loading-spinner ${size}`}>
