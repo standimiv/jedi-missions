@@ -1,4 +1,4 @@
-import {JournalEntry, MissionTemplate, TaskDifficulty, TemplateData, Todo} from '../types/app';
+import {JournalEntry, MissionSubjects, MissionTemplate, TaskDifficulty, TemplateData, Todo} from '../types/app';
 
 export const STORAGE_KEY = 'jedi-missions-v1';
 
@@ -28,11 +28,28 @@ const DIFFICULTIES: TaskDifficulty[] = ['padawan', 'knight', 'master'];
 const isDifficulty = (value: unknown): value is TaskDifficulty =>
   typeof value === 'string' && DIFFICULTIES.includes(value as TaskDifficulty);
 
+const SUBJECT_KEYS = ['character', 'planet', 'starship', 'species'] as const;
+
+const reviveSubjects = (value: unknown): MissionSubjects | undefined => {
+  if (!value || typeof value !== 'object') {
+    return undefined;
+  }
+  const raw = value as Record<string, unknown>;
+  const subjects: MissionSubjects = {};
+  SUBJECT_KEYS.forEach(key => {
+    const name = raw[key];
+    if (typeof name === 'string' && name.trim()) {
+      subjects[key] = name.trim().slice(0, 80);
+    }
+  });
+  return Object.keys(subjects).length > 0 ? subjects : undefined;
+};
+
 const reviveTodo = (value: unknown): Todo | null => {
   if (!value || typeof value !== 'object') {
     return null;
   }
-  const raw = value as Partial<Todo> & {createdAt?: string};
+  const raw = value as Partial<Todo> & {createdAt?: string; subjects?: unknown};
   const createdAt = new Date(raw.createdAt ?? '');
   if (typeof raw.id !== 'string' || typeof raw.text !== 'string' || !raw.text.trim()) {
     return null;
@@ -40,6 +57,7 @@ const reviveTodo = (value: unknown): Todo | null => {
   if (!isDifficulty(raw.difficulty) || Number.isNaN(createdAt.getTime())) {
     return null;
   }
+  const subjects = reviveSubjects(raw.subjects);
   return {
     id: raw.id,
     text: raw.text,
@@ -47,6 +65,7 @@ const reviveTodo = (value: unknown): Todo | null => {
     difficulty: raw.difficulty,
     createdAt,
     ...(raw.custom === true ? {custom: true} : {}),
+    ...(subjects ? {subjects} : {}),
   };
 };
 

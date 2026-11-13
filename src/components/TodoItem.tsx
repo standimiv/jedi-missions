@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {TaskDifficulty, Todo} from '../types/app';
+import {MissionSubjects, TaskDifficulty, Todo} from '../types/app';
 import {useTodoContext} from '../context/TodoContext';
 import './TodoItem.css';
 
@@ -58,17 +58,34 @@ const TodoItem: React.FC<TodoItemProps> = ({todo}) => {
     }, motionDelay(500));
   };
 
-  const getDifficultyIcon = (difficulty: string) => {
-    switch (difficulty) {
-      case 'padawan':
-        return '🌟';
-      case 'knight':
-        return '⚔️';
-      case 'master':
-        return '🔥';
-      default:
-        return '📋';
+  const subjectChips = (subjects: MissionSubjects | undefined) => {
+    if (!subjects) {
+      return null;
     }
+    const chips = (
+      [
+        ['character', 'Character'],
+        ['planet', 'Planet'],
+        ['starship', 'Starship'],
+        ['species', 'Species'],
+      ] as const
+    ).flatMap(([key, label]) => {
+      const name = subjects[key];
+      return name ? [{key, label, name}] : [];
+    });
+    if (chips.length === 0) {
+      return null;
+    }
+    return (
+      <ul className="subject-chips">
+        {chips.map(chip => (
+          <li key={chip.key}>
+            <span className="chip-label">{chip.label}</span>
+            {chip.name}
+          </li>
+        ))}
+      </ul>
+    );
   };
 
   const getDifficultyLabel = (difficulty: string) => {
@@ -92,9 +109,12 @@ const TodoItem: React.FC<TodoItemProps> = ({todo}) => {
       aria-describedby={`todo-difficulty-${todo.id} todo-date-${todo.id}`}
     >
       {/* Difficulty Badge */}
-      <div className="difficulty-badge" id={`todo-difficulty-${todo.id}`}>
-        <span className="difficulty-icon" aria-hidden="true">{getDifficultyIcon(todo.difficulty)}</span>
-        <span className="difficulty-label">{getDifficultyLabel(todo.difficulty)} Level</span>
+      <div className="badge-row">
+        <div className="difficulty-badge" id={`todo-difficulty-${todo.id}`}>
+          <span className="difficulty-label">{getDifficultyLabel(todo.difficulty)}</span>
+        </div>
+        {todo.custom && <span className="hand-order">Hand order</span>}
+        {todo.completed && <span className="filed-mark">Filed</span>}
       </div>
 
       {/* Mission Content */}
@@ -140,6 +160,7 @@ const TodoItem: React.FC<TodoItemProps> = ({todo}) => {
             {todo.text}
           </div>
         )}
+        {subjectChips(todo.subjects)}
 
         {/* Mission Date */}
         <div className="mission-date" id={`todo-date-${todo.id}`}>
@@ -197,10 +218,10 @@ const TodoItem: React.FC<TodoItemProps> = ({todo}) => {
       {/* Force Effect Overlay for Completed Items */}
       {todo.completed && (
         <div className="force-overlay">
-          <div className="force-particles">
-            <span className="particle">✨</span>
-            <span className="particle">⭐</span>
-            <span className="particle">✨</span>
+          <div className="force-particles" aria-hidden="true">
+            <span className="particle"></span>
+            <span className="particle"></span>
+            <span className="particle"></span>
           </div>
         </div>
       )}

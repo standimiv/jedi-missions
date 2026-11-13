@@ -351,10 +351,6 @@
     font-size: var(--font-size-base);
   }
 
-  .expand-text {
-    display: none;
-  }
-
   .mission-input {
     min-height: 60px;
   }

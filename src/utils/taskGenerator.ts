@@ -1,4 +1,4 @@
-import {Todo, TaskTemplate, TemplateData, SwapiDataType} from '../types/app';
+import {Todo, TaskTemplate, TemplateData, SwapiDataType, MissionSubjects} from '../types/app';
 import {TASK_TEMPLATES} from './taskTemplates';
 
 // Generate a unique ID for tasks
@@ -10,24 +10,50 @@ export const generateTaskId = (): string => {
 const pickRandom = (items: string[]): string =>
   items[Math.floor(Math.random() * items.length)];
 
-const replaceFirstPlaceholder = (
+const assignName = (
   text: string,
   placeholder: string,
-  items: string[] | undefined
+  items: string[] | undefined,
+  key: keyof MissionSubjects,
+  subjects: MissionSubjects
 ): string => {
   if (!items || items.length === 0 || !text.includes(placeholder)) {
     return text;
   }
-  return text.replace(placeholder, pickRandom(items));
+  const name = pickRandom(items);
+  subjects[key] = name;
+  return text.replace(placeholder, name);
 };
 
-export const populateTemplate = (template: TaskTemplate, swapiData: TemplateData): string => {
-  let populatedText = template.template;
-  populatedText = replaceFirstPlaceholder(populatedText, '{character}', swapiData.people);
-  populatedText = replaceFirstPlaceholder(populatedText, '{planet}', swapiData.planets);
-  populatedText = replaceFirstPlaceholder(populatedText, '{starship}', swapiData.starships);
-  populatedText = replaceFirstPlaceholder(populatedText, '{species}', swapiData.species);
-  return populatedText;
+const fillTemplate = (
+  template: TaskTemplate,
+  swapiData: TemplateData
+): {text: string; subjects?: MissionSubjects} => {
+  const subjects: MissionSubjects = {};
+  let text = template.template;
+  text = assignName(text, '{character}', swapiData.people, 'character', subjects);
+  text = assignName(text, '{planet}', swapiData.planets, 'planet', subjects);
+  text = assignName(text, '{starship}', swapiData.starships, 'starship', subjects);
+  text = assignName(text, '{species}', swapiData.species, 'species', subjects);
+  return {
+    text,
+    ...(Object.keys(subjects).length > 0 ? {subjects} : {}),
+  };
+};
+
+export const populateTemplate = (template: TaskTemplate, swapiData: TemplateData): string =>
+  fillTemplate(template, swapiData).text;
+
+const missionFromTemplate = (template: TaskTemplate, swapiData: TemplateData): Todo => {
+  const filled = fillTemplate(template, swapiData);
+  return {
+    id: generateTaskId(),
+    text: filled.text,
+    completed: false,
+    difficulty: template.difficulty,
+    createdAt: new Date(),
+    ...(filled.subjects ? {subjects: filled.subjects} : {}),
+  };
 };
 
 // Check if we have the required data for a template
@@ -77,19 +103,7 @@ export const generateSingleTask = (swapiData: TemplateData, usedTemplateIds: Set
   // Select random template
   const randomTemplate = templatesToUse[Math.floor(Math.random() * templatesToUse.length)];
 
-  // Populate template with SWAPI data
-  const populatedText = populateTemplate(randomTemplate, swapiData);
-
-  // Create the todo item
-  const todo: Todo = {
-    id: generateTaskId(),
-    text: populatedText,
-    completed: false,
-    difficulty: randomTemplate.difficulty,
-    createdAt: new Date(),
-  };
-
-  return todo;
+  return missionFromTemplate(randomTemplate, swapiData);
 };
 
 // Generate multiple tasks with balanced difficulty distribution
@@ -119,15 +133,7 @@ export const generateTasks = (
         const templatesToUse = unusedTemplates.length > 0 ? unusedTemplates : availableTemplates;
 
         const randomTemplate = templatesToUse[Math.floor(Math.random() * templatesToUse.length)];
-        const populatedText = populateTemplate(randomTemplate, swapiData);
-
-        const task: Todo = {
-          id: generateTaskId(),
-          text: populatedText,
-          completed: false,
-          difficulty: randomTemplate.difficulty,
-          createdAt: new Date(),
-        };
+        const task = missionFromTemplate(randomTemplate, swapiData);
 
         tasks.push(task);
         usedTemplateIds.add(randomTemplate.id);

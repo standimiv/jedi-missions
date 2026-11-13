@@ -1,18 +1,43 @@
 /* App Layout Styles */
 .app-layout {
+  --rank-accent: var(--color-sith-red);
+  --rank-glow: 0.45;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   background-color: var(--color-dark-primary);
   color: var(--color-text-primary);
+  isolation: isolate;
+}
+
+.app-layout[data-rank="padawan"] {
+  --rank-accent: var(--color-padawan);
+  --rank-glow: 0.75;
+}
+
+.app-layout[data-rank="knight"] {
+  --rank-accent: var(--color-knight);
+  --rank-glow: 0.8;
+}
+
+.app-layout[data-rank="master"] {
+  --rank-accent: var(--color-sith-yellow);
+  --rank-glow: 0.95;
 }
 
 /* Header Styles */
 .app-header {
+  position: relative;
+  z-index: var(--z-content);
   background: linear-gradient(135deg, var(--color-dark-secondary), var(--color-dark-tertiary));
-  border-bottom: 2px solid var(--color-sith-red);
-  box-shadow: 0 2px 10px rgba(220, 20, 60, 0.2);
+  border-bottom: 2px solid var(--color-dark-accent);
   padding: var(--spacing-lg) var(--spacing-md);
+}
+
+.app-layout[data-rank="padawan"] .app-header,
+.app-layout[data-rank="knight"] .app-header,
+.app-layout[data-rank="master"] .app-header {
+  border-bottom-color: var(--rank-accent);
 }
 
 .header-content {
@@ -26,16 +51,15 @@
 }
 
 .app-title {
+  font-family: var(--font-family-heading);
   font-size: var(--font-size-3xl);
-  font-weight: bold;
+  font-weight: 600;
   margin: 0;
-  text-shadow: 0 0 10px var(--color-sith-red);
-  letter-spacing: 2px;
+  letter-spacing: 0.12em;
 }
 
 .title-sith {
-  color: var(--color-sith-red);
-  text-shadow: var(--glow-sith-red);
+  color: var(--rank-accent);
 }
 
 .title-separator {
@@ -45,7 +69,6 @@
 
 .title-jedi {
   color: var(--color-text-primary);
-  text-shadow: 0 0 5px var(--color-text-primary);
 }
 
 .mission-status {
@@ -53,27 +76,101 @@
   flex-direction: column;
   align-items: flex-end;
   text-align: right;
+  gap: var(--spacing-xs);
+  min-width: min(100%, 18rem);
 }
 
 .status-text {
-  font-size: var(--font-size-sm);
+  font-family: var(--font-family-meta);
+  font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
-  margin-bottom: var(--spacing-xs);
+}
+
+.rank-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  width: 100%;
 }
 
 .rank-indicator {
-  font-size: var(--font-size-lg);
-  font-weight: bold;
-  color: var(--color-sith-orange);
-  text-shadow: 0 0 5px var(--color-sith-orange);
+  font-family: var(--font-family-meta);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--rank-accent);
   padding: var(--spacing-xs) var(--spacing-sm);
-  border: 1px solid var(--color-sith-orange);
+  border: 1px solid var(--rank-accent);
   border-radius: var(--border-radius-sm);
-  background: rgba(255, 69, 0, 0.1);
+  white-space: nowrap;
+}
+
+.rank-saber {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  flex: 1;
+  min-width: 7rem;
+}
+
+.rank-saber-hilt {
+  width: 14px;
+  height: 10px;
+  flex: 0 0 auto;
+  background: var(--color-dark-accent);
+  border: 1px solid var(--color-text-muted);
+  border-radius: 2px;
+}
+
+.rank-saber-track {
+  flex: 1;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.rank-saber-blade {
+  height: 100%;
+  width: 0;
+  border-radius: 3px;
+  background: var(--rank-accent);
+  box-shadow: 0 0 8px var(--rank-accent);
+  opacity: var(--rank-glow);
+  transition: width var(--transition-slow) ease-in-out;
+}
+
+.rank-saber-blade.is-dark {
+  box-shadow: none;
+}
+
+.rank-saber-blade.ignite {
+  animation: blade-ignite 0.7s ease-out;
+}
+
+.rank-saber-value {
+  font-family: var(--font-family-meta);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  min-width: 2.5rem;
+  text-align: right;
+}
+
+@keyframes blade-ignite {
+  0% {
+    filter: brightness(2.2);
+  }
+
+  100% {
+    filter: brightness(1);
+  }
 }
 
 /* Main Content */
 .app-main {
+  position: relative;
+  z-index: var(--z-content);
   flex: 1;
   display: flex;
   justify-content: center;
@@ -85,210 +182,11 @@
   max-width: 1200px;
 }
 
-/* Footer Styles */
-.app-footer {
-  background: linear-gradient(135deg, var(--color-dark-tertiary), var(--color-dark-secondary));
-  border-top: 2px solid var(--color-sith-red);
-  padding: var(--spacing-lg) var(--spacing-md);
-}
-
-.footer-content {
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.progress-container {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-}
-
-.progress-label {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-/* Enhanced Lightsaber Progress Bar */
-.lightsaber-progress {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  height: 24px;
-  position: relative;
-}
-
-.lightsaber-hilt {
-  width: 50px;
-  height: 24px;
-  background: linear-gradient(to right,
-      #1a1a1a 0%,
-      #3a3a3a 20%,
-      #4a4a4a 50%,
-      #3a3a3a 80%,
-      #1a1a1a 100%);
-  border: 1px solid var(--color-text-muted);
-  border-radius: 4px;
-  position: relative;
-  box-shadow:
-    inset 0 1px 2px rgba(255, 255, 255, 0.1),
-    0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.lightsaber-hilt::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  right: -3px;
-  transform: translateY(-50%);
-  width: 6px;
-  height: 16px;
-  background: linear-gradient(to bottom, #555, #777, #555);
-  border-radius: 3px;
-  border: 1px solid #333;
-}
-
-.lightsaber-hilt::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 8px;
-  transform: translateY(-50%);
-  width: 3px;
-  height: 12px;
-  background: #222;
-  border-radius: 1px;
-  box-shadow:
-    6px 0 0 #222,
-    12px 0 0 #222,
-    18px 0 0 #222;
-}
-
-.lightsaber-blade-container {
-  flex: 1;
-  height: 12px;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 6px;
-  overflow: hidden;
-  position: relative;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.lightsaber-blade {
-  height: 100%;
-  border-radius: 6px;
-  transition: all var(--transition-slow) ease-in-out;
-  position: relative;
-  background: linear-gradient(90deg,
-      var(--color-sith-dark-red) 0%,
-      var(--color-sith-red) 25%,
-      var(--color-sith-orange) 75%,
-      var(--color-sith-yellow) 100%);
-  box-shadow:
-    0 0 10px var(--color-sith-red),
-    0 0 20px var(--color-sith-red),
-    inset 0 1px 3px rgba(255, 255, 255, 0.4);
-  animation: blade-pulse 2s ease-in-out infinite alternate;
-}
-
-/* Dynamic color changes based on progress */
-.lightsaber-blade[style*="width: 0%"] {
-  background: transparent;
-  box-shadow: none;
-  animation: none;
-}
-
-.lightsaber-blade[style*="width: 1"][style*="%"],
-.lightsaber-blade[style*="width: 2"][style*="%"] {
-  background: linear-gradient(90deg,
-      var(--color-sith-dark-red) 0%,
-      var(--color-sith-red) 100%);
-  box-shadow:
-    0 0 8px var(--color-sith-red),
-    inset 0 1px 2px rgba(255, 255, 255, 0.3);
-}
-
-.lightsaber-blade[style*="width: 5"][style*="%"],
-.lightsaber-blade[style*="width: 6"][style*="%"],
-.lightsaber-blade[style*="width: 7"][style*="%"] {
-  background: linear-gradient(90deg,
-      var(--color-sith-red) 0%,
-      var(--color-sith-orange) 100%);
-  box-shadow:
-    0 0 12px var(--color-sith-orange),
-    0 0 8px var(--color-sith-red),
-    inset 0 1px 3px rgba(255, 255, 255, 0.4);
-}
-
-.lightsaber-blade[style*="width: 9"][style*="%"],
-.lightsaber-blade[style*="width: 100%"] {
-  background: linear-gradient(90deg,
-      var(--color-sith-orange) 0%,
-      var(--color-sith-yellow) 50%,
-      #ffffff 100%);
-  box-shadow:
-    0 0 15px var(--color-sith-yellow),
-    0 0 10px var(--color-sith-orange),
-    0 0 5px var(--color-sith-red),
-    inset 0 1px 4px rgba(255, 255, 255, 0.6);
-  animation: blade-master-glow 1.5s ease-in-out infinite alternate;
-}
-
-.lightsaber-blade::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(90deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.6) 20%,
-      rgba(255, 255, 255, 0.8) 50%,
-      rgba(255, 255, 255, 0.6) 80%,
-      transparent 100%);
-  animation: blade-shimmer 3s ease-in-out infinite;
-  border-radius: 6px;
-}
-
-@keyframes blade-pulse {
-  from {
-    opacity: 0.8;
-    filter: brightness(1);
-  }
-
-  to {
-    opacity: 1;
-    filter: brightness(1.2);
-  }
-}
-
-@keyframes blade-master-glow {
-  from {
-    opacity: 0.9;
-    filter: brightness(1.1);
-    transform: scaleY(1);
-  }
-
-  to {
-    opacity: 1;
-    filter: brightness(1.4);
-    transform: scaleY(1.1);
-  }
-}
-
-@keyframes blade-shimmer {
-
-  0%,
-  100% {
-    opacity: 0.3;
-    transform: translateX(-100%);
-  }
-
-  50% {
-    opacity: 0.8;
-    transform: translateX(100%);
+@media (prefers-reduced-motion: reduce) {
+  .rank-saber-blade,
+  .rank-saber-blade.ignite {
+    transition: none;
+    animation: none;
   }
 }
 
@@ -304,16 +202,16 @@
   }
 
   .mission-status {
-    align-items: center;
+    align-items: stretch;
     text-align: center;
+    width: 100%;
+  }
+
+  .rank-row {
+    justify-content: center;
   }
 
   .app-main {
     padding: var(--spacing-lg) var(--spacing-sm);
-  }
-
-  .lightsaber-hilt {
-    width: 30px;
-    height: 16px;
   }
 }

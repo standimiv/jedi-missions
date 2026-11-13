@@ -135,10 +135,11 @@
 }
 
 .stat-label {
-  font-size: var(--font-size-sm);
+  font-family: var(--font-family-meta);
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.08em;
   margin-bottom: var(--spacing-xs);
 }
 
@@ -222,6 +223,8 @@
 
 .mission-journal {
   margin-top: var(--spacing-xl);
+  border-left: 2px solid var(--rank-accent);
+  padding-left: var(--spacing-md);
 }
 
 .undo-bar {
@@ -252,9 +255,22 @@
 }
 
 .journal-day h4 {
+  display: inline-block;
   margin: 0 0 var(--spacing-xs);
+  padding: 0.1rem 0.45rem;
+  border: 1px solid var(--color-dark-accent);
+  border-radius: var(--border-radius-sm);
   color: var(--color-text-primary);
-  font-size: var(--font-size-sm);
+  font-family: var(--font-family-meta);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.journal-list time {
+  font-family: var(--font-family-meta);
+  color: var(--color-text-muted);
 }
 
 .journal-list {
@@ -331,11 +347,22 @@
 /* Todo Grid */
 .todo-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  grid-template-columns: minmax(0, 42rem);
+  justify-content: center;
   gap: var(--spacing-lg);
   list-style: none;
   margin: 0;
   padding: 0;
+}
+
+.todo-grid.completed-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+  justify-content: stretch;
+  gap: var(--spacing-md);
+}
+
+.completed-grid .todo-item {
+  padding: var(--spacing-md);
 }
 
 .todo-grid > * {

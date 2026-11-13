@@ -1,6 +1,14 @@
 // Difficulty levels for tasks
 export type TaskDifficulty = 'padawan' | 'knight' | 'master';
 
+// Names that filled a generated mission. Older saves omit this.
+export interface MissionSubjects {
+  character?: string;
+  planet?: string;
+  starship?: string;
+  species?: string;
+}
+
 // Individual todo item
 export interface Todo {
   id: string;
@@ -9,6 +17,7 @@ export interface Todo {
   difficulty: TaskDifficulty;
   createdAt: Date;
   custom?: boolean;
+  subjects?: MissionSubjects;
 }
 
 // One line written when a mission is completed

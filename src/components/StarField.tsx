@@ -14,7 +14,11 @@ interface Star {
 const STAR_COUNT = 200;
 const STAR_LAYERS = 3;
 
-const StarField: React.FC = () => {
+interface StarFieldProps {
+  streak?: boolean;
+}
+
+const StarField: React.FC<StarFieldProps> = ({streak = false}) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const starsRef = useRef<Star[]>([]);
   const animationRef = useRef<number | undefined>(undefined);
@@ -71,8 +75,9 @@ const StarField: React.FC = () => {
         ctx.shadowColor = 'transparent';
         ctx.shadowBlur = 0;
 
-        star.x += star.speed * 0.1;
-        star.y += star.speed * 0.05;
+        const drift = star.layer === 3 ? 0.45 : star.layer === 2 ? 0.18 : 0.08;
+        star.x += star.speed * drift;
+        star.y += star.speed * drift * 0.35;
 
         if (star.x > width + star.size) {
           star.x = -star.size;
@@ -134,6 +139,18 @@ const StarField: React.FC = () => {
         className="starfield-canvas"
         aria-hidden="true"
       />
+
+      {streak && (
+        <div className="hyperspace" aria-hidden="true">
+          {Array.from({length: 7}, (_, index) => (
+            <span
+              key={index}
+              className="hyperspace-line"
+              style={{top: `${12 + index * 12}%`, animationDelay: `${index * 40}ms`}}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Subtle nebula effect overlay */}
       <div className="nebula-overlay">

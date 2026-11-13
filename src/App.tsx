@@ -168,12 +168,12 @@ const AppContent: React.FC = () => {
           {/* Add Todo Component */}
           <AddTodo />
           <div className="save-actions">
-            <button type="button" className="status-retry" onClick={exportSave}>
+            <button type="button" className="utility-btn" onClick={exportSave}>
               Export save
             </button>
             <button
               type="button"
-              className="status-retry"
+              className="utility-btn"
               onClick={() => fileRef.current?.click()}
               disabled={state.isLoading}
             >
