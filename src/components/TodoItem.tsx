@@ -184,16 +184,6 @@ const TodoItem: React.FC<TodoItemProps> = ({todo}) => {
         </button>
       </div>
 
-      {/* Force Effect Overlay for Completed Items */}
-      {todo.completed && (
-        <div className="force-overlay">
-          <div className="force-particles">
-            <span className="particle">✨</span>
-            <span className="particle">⭐</span>
-            <span className="particle">✨</span>
-          </div>
-        </div>
-      )}
     </li>
   );
 };

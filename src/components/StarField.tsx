@@ -135,8 +135,9 @@ const StarField: React.FC<StarFieldProps> = ({accent = '#4a90e2'}) => {
         ctx.shadowColor = 'transparent';
         ctx.shadowBlur = 0;
 
-        star.x += star.speed * 0.1;
-        star.y += star.speed * 0.05;
+        const drift = star.layer === 3 ? 0.45 : star.layer === 2 ? 0.18 : 0.08;
+        star.x += star.speed * drift;
+        star.y += star.speed * drift * 0.35;
 
         if (star.x > width + star.size) {
           star.x = -star.size;

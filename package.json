@@ -4,6 +4,7 @@
   "private": true,
   "homepage": "https://standimiv.github.io/jedi-missions",
   "dependencies": {
+    "@fontsource/ibm-plex-sans": "^5.2.6",
     "@fontsource/orbitron": "^5.2.8",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",

@@ -8,6 +8,13 @@
 }
 
 /* Header Styles */
+.app-header,
+.app-main,
+.app-footer {
+  position: relative;
+  z-index: var(--z-content);
+}
+
 .app-header {
   background: linear-gradient(135deg, var(--color-dark-secondary), var(--color-dark-tertiary));
   border-bottom: 2px solid var(--color-sith-red);

@@ -1,6 +1,9 @@
 /* TodoItem Component Styles */
 .todo-item {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   background: linear-gradient(135deg, var(--color-dark-secondary), var(--color-dark-tertiary));
   border: 1px solid var(--color-dark-accent);
   border-radius: var(--border-radius-lg);
@@ -118,6 +121,9 @@
 
 /* Mission Content */
 .mission-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
   margin-bottom: var(--spacing-lg);
   min-width: 0;
 }
@@ -133,6 +139,7 @@
 }
 
 .mission-date {
+  margin-top: auto;
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);
   font-style: italic;

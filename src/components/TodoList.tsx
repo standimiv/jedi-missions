@@ -39,7 +39,6 @@ const Journal: React.FC<{entries: JournalEntry[]}> = ({entries}) => {
   return (
     <section className="mission-journal" aria-labelledby="journal-heading">
       <h3 id="journal-heading" className="section-title">
-        <span className="title-icon" aria-hidden="true">📖</span>
         Mission journal
       </h3>
       {days.map(day => (
@@ -213,7 +212,6 @@ const TodoList: React.FC<TodoListProps> = ({onRetry}) => {
           {status !== 'completed' && activeMissions.length > 0 && (
             <section className="mission-section" aria-labelledby="active-missions-heading">
               <h3 id="active-missions-heading" className="section-title">
-                <span className="title-icon" aria-hidden="true">⚔️</span>
                 Active Missions
               </h3>
               <ul className="todo-grid" aria-label="Active missions">
@@ -227,7 +225,6 @@ const TodoList: React.FC<TodoListProps> = ({onRetry}) => {
           {status !== 'active' && completedMissions.length > 0 && (
             <section className="mission-section completed-section" aria-labelledby="completed-missions-heading">
               <h3 id="completed-missions-heading" className="section-title">
-                <span className="title-icon" aria-hidden="true">✨</span>
                 Completed Missions
               </h3>
               <ul className="todo-grid" aria-label="Completed missions">

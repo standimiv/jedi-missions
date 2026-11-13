@@ -34,7 +34,7 @@
   --glow-subtle: 0 0 5px rgba(220, 20, 60, 0.3);
 
   /* Typography */
-  --font-family-primary: 'Arial', 'Helvetica', sans-serif;
+  --font-family-primary: 'IBM Plex Sans', 'Segoe UI', sans-serif;
   --font-family-heading: 'Orbitron', 'Arial Black', 'Helvetica', sans-serif;
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
@@ -68,8 +68,8 @@
   --animation-slow: 1s;
   --animation-very-slow: 2s;
 
-  /* Z-Index Layers */
-  --z-starfield: -1;
+  /* Z-Index Layers. 0 keeps the starfield above the page background and under the chrome. */
+  --z-starfield: 0;
   --z-content: 1;
   --z-modal: 100;
   --z-tooltip: 200;
