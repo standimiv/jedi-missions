@@ -67,8 +67,14 @@
 }
 
 .generate-btn .btn-icon {
+  display: inline-flex;
+  align-items: center;
   font-size: var(--font-size-lg);
   animation: spin 1s linear infinite;
+}
+
+.generate-btn .difficulty-mark {
+  width: 1.5rem;
 }
 
 .generate-btn:not(:disabled) .btn-icon {

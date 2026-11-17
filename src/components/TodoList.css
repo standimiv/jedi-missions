@@ -247,8 +247,18 @@
   font: inherit;
 }
 
+.filter-empty {
+  margin: 0 0 var(--spacing-lg);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-style: italic;
+}
+
 .journal-day {
   margin-bottom: var(--spacing-md);
+  margin-left: 0.35rem;
+  padding-left: 0.9rem;
+  border-left: 1px solid var(--color-dark-accent);
 }
 
 .journal-day h4 {
@@ -267,12 +277,48 @@
 }
 
 .journal-list li {
+  position: relative;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 0.5rem 0.75rem;
   align-items: baseline;
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
+}
+
+.journal-list li::before {
+  content: '';
+  position: absolute;
+  left: -1.05rem;
+  top: 0.45em;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.journal-entry.difficulty-padawan {
+  color: var(--color-padawan);
+}
+
+.journal-entry.difficulty-knight {
+  color: var(--color-knight);
+}
+
+.journal-entry.difficulty-master {
+  color: var(--color-master);
+}
+
+.journal-list time,
+.journal-list li > span:last-child {
+  color: var(--color-text-secondary);
+}
+
+.journal-list li > span:last-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .journal-difficulty {

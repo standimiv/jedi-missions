@@ -95,7 +95,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({children}) => {
               <div className="lightsaber-hilt"></div>
               <div className="lightsaber-blade-container">
                 <div
-                  className="lightsaber-blade"
+                  className={`lightsaber-blade blade-rank-${rank}`}
                   style={{width: `${completionPercentage}%`}}
                 ></div>
               </div>

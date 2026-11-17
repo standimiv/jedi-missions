@@ -46,7 +46,7 @@ const Journal: React.FC<{entries: JournalEntry[]}> = ({entries}) => {
           <h4>{day.label}</h4>
           <ul className="journal-list">
             {day.entries.map(entry => (
-              <li key={entry.id}>
+              <li key={entry.id} className={`journal-entry difficulty-${entry.difficulty}`}>
                 <time dateTime={entry.completedAt}>
                   {new Date(entry.completedAt).toLocaleTimeString()}
                 </time>
@@ -203,10 +203,7 @@ const TodoList: React.FC<TodoListProps> = ({onRetry}) => {
           </div>
 
           {filtersHideEverything && (
-            <div className="empty-state">
-              <h3>No matching missions</h3>
-              <p>Try a different search, difficulty, or status.</p>
-            </div>
+            <p className="filter-empty">No matching missions</p>
           )}
 
           {status !== 'completed' && activeMissions.length > 0 && (

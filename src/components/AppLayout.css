@@ -284,6 +284,34 @@
   animation: blade-master-glow 1.5s ease-in-out infinite alternate;
 }
 
+.lightsaber-progress .lightsaber-blade.blade-rank-youngling,
+.lightsaber-progress .lightsaber-blade.blade-rank-padawan {
+  background: linear-gradient(90deg, #ffffff, var(--color-padawan));
+  box-shadow:
+    0 0 10px var(--color-padawan),
+    inset 0 1px 3px rgba(255, 255, 255, 0.45);
+}
+
+.lightsaber-progress .lightsaber-blade.blade-rank-knight {
+  background: linear-gradient(90deg, #ffffff, var(--color-sith-orange));
+  box-shadow:
+    0 0 10px var(--color-sith-orange),
+    inset 0 1px 3px rgba(255, 255, 255, 0.45);
+}
+
+.lightsaber-progress .lightsaber-blade.blade-rank-master {
+  background: linear-gradient(90deg, #ffffff, var(--color-sith-red));
+  box-shadow:
+    0 0 12px var(--color-sith-red),
+    inset 0 1px 3px rgba(255, 255, 255, 0.5);
+}
+
+.lightsaber-progress .lightsaber-blade[style*="width: 0%"] {
+  background: transparent;
+  box-shadow: none;
+  animation: none;
+}
+
 .lightsaber-blade::after {
   content: '';
   position: absolute;

@@ -149,7 +149,7 @@ const TodoItem: React.FC<TodoItemProps> = ({todo}) => {
           disabled={isAnimating !== null}
         >
           <span className="btn-icon" aria-hidden="true">
-            {todo.completed ? '↩️' : '✅'}
+            <DifficultyMark difficulty={todo.completed ? 'knight' : 'padawan'} />
           </span>
           <span className="btn-text">
             {todo.completed ? 'Reopen' : 'Complete'}
@@ -168,7 +168,9 @@ const TodoItem: React.FC<TodoItemProps> = ({todo}) => {
             aria-label={`Edit mission "${todo.text}"`}
             disabled={isAnimating !== null}
           >
-            <span className="btn-icon" aria-hidden="true">✏️</span>
+            <span className="btn-icon" aria-hidden="true">
+              <DifficultyMark difficulty="knight" />
+            </span>
             <span className="btn-text">Edit</span>
           </button>
         )}
@@ -179,7 +181,9 @@ const TodoItem: React.FC<TodoItemProps> = ({todo}) => {
           aria-label={`Delete mission "${todo.text}"`}
           disabled={isAnimating !== null}
         >
-          <span className="btn-icon" aria-hidden="true">🗡️</span>
+          <span className="btn-icon" aria-hidden="true">
+            <DifficultyMark difficulty="master" />
+          </span>
           <span className="btn-text">Abandon</span>
         </button>
       </div>

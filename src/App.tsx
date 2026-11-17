@@ -7,6 +7,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import {useSwapi} from './hooks/useSwapi';
 import {generateTasks, generateFallbackTasks} from './utils/taskGenerator';
 import {hasSwapiNames, parsePersisted} from './utils/storage';
+import DifficultyMark from './components/DifficultyMark';
 import './App.css';
 
 // Main app content component (needs to be inside TodoProvider)
@@ -158,7 +159,9 @@ const AppContent: React.FC = () => {
               onClick={requestNewMissions}
               disabled={state.isLoading}
             >
-              <span className="btn-icon">🔄</span>
+              <span className="btn-icon" aria-hidden="true">
+                <DifficultyMark difficulty="master" />
+              </span>
               <span className="btn-text">
                 {state.isLoading ? 'Generating...' : 'New Missions'}
               </span>
