@@ -1,5 +1,5 @@
 import React, {useMemo, useState} from 'react';
-import {useTodoContext} from '../context/TodoContext';
+import {useTodoContext, UNDO_WINDOW_MS} from '../context/TodoContext';
 import TodoItem from './TodoItem';
 import {JournalEntry, TaskDifficulty, Todo} from '../types/app';
 import './TodoList.css';
@@ -7,6 +7,7 @@ import Loading from './Loading';
 
 interface TodoListProps {
   onRetry?: () => void;
+  pane?: 'missions' | 'journal';
 }
 
 type DifficultyFilter = 'all' | TaskDifficulty;
@@ -21,10 +22,7 @@ const matchesFilter = (todo: Todo, query: string, difficulty: DifficultyFilter):
 };
 
 const Journal: React.FC<{entries: JournalEntry[]}> = ({entries}) => {
-  if (entries.length === 0) {
-    return null;
-  }
-
+  const {clearJournal} = useTodoContext();
   const days: {label: string; entries: JournalEntry[]}[] = [];
   [...entries].reverse().forEach(entry => {
     const label = new Date(entry.completedAt).toLocaleDateString();
@@ -36,12 +34,29 @@ const Journal: React.FC<{entries: JournalEntry[]}> = ({entries}) => {
     days.push({label, entries: [entry]});
   });
 
+  const clear = () => {
+    if (entries.length === 0) {
+      return;
+    }
+    if (!window.confirm('Clear the mission journal? Your missions stay.')) {
+      return;
+    }
+    clearJournal();
+  };
+
   return (
     <section className="mission-journal" aria-labelledby="journal-heading">
-      <h3 id="journal-heading" className="section-title">
-        Mission journal
-      </h3>
-      {days.map(day => (
+      <div className="journal-header">
+        <h3 id="journal-heading" className="section-title">
+          Mission journal
+        </h3>
+        <button type="button" onClick={clear} disabled={entries.length === 0}>
+          Clear journal
+        </button>
+      </div>
+      {entries.length === 0 ? (
+        <p className="filter-empty">No completions yet.</p>
+      ) : days.map(day => (
         <section key={day.label} className="journal-day">
           <h4>{day.label}</h4>
           <ul className="journal-list">
@@ -87,7 +102,7 @@ const DifficultyStat: React.FC<{
   );
 };
 
-const TodoList: React.FC<TodoListProps> = ({onRetry}) => {
+const TodoList: React.FC<TodoListProps> = ({onRetry, pane = 'missions'}) => {
   const {
     state,
     undoTodo,
@@ -112,6 +127,14 @@ const TodoList: React.FC<TodoListProps> = ({onRetry}) => {
   const filtersHideEverything = totalTodos > 0
     && (status === 'completed' || activeMissions.length === 0)
     && (status === 'active' || completedMissions.length === 0);
+
+  if (pane === 'journal') {
+    return (
+      <div className="todo-list-container" id="mission-journal" tabIndex={-1} aria-label="Mission journal">
+        <Journal entries={state.journal} />
+      </div>
+    );
+  }
 
   if (state.isLoading) {
     return (
@@ -139,6 +162,12 @@ const TodoList: React.FC<TodoListProps> = ({onRetry}) => {
         <div className="undo-bar" role="status">
           <span>Abandoned: {undoTodo.text}</span>
           <button type="button" onClick={undoDelete}>Undo</button>
+          <span className="undo-blade" aria-hidden="true">
+            <span
+              className="undo-blade-fill"
+              style={{animationDuration: `${UNDO_WINDOW_MS}ms`}}
+            />
+          </span>
         </div>
       )}
       {state.error && totalTodos === 0 ? (
@@ -233,8 +262,6 @@ const TodoList: React.FC<TodoListProps> = ({onRetry}) => {
           )}
         </>
       )}
-
-      <Journal entries={state.journal} />
     </div>
   );
 };

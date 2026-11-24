@@ -95,7 +95,9 @@ const AddTodo: React.FC = () => {
           className="expand-btn"
           onClick={() => setIsExpanded(true)}
         >
-          <span className="expand-icon">➕</span>
+          <span className="expand-icon" aria-hidden="true">
+            <DifficultyMark difficulty="master" />
+          </span>
           <span className="expand-text">Create Custom Mission</span>
         </button>
         {state.templates.length > 0 && savedTemplates}
@@ -107,7 +109,9 @@ const AddTodo: React.FC = () => {
     <div className="add-todo-container expanded">
       <div className="form-header">
         <h3 className="form-title">
-          <span className="title-icon">📜</span>
+          <span className="title-icon" aria-hidden="true">
+            <DifficultyMark difficulty="master" />
+          </span>
           Create Your Mission
         </h3>
         <button

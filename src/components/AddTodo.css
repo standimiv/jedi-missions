@@ -42,7 +42,12 @@
 }
 
 .expand-btn:hover .expand-icon {
-  transform: rotate(90deg);
+  transform: none;
+}
+
+.expand-icon .difficulty-mark,
+.title-icon .difficulty-mark {
+  width: 1.5rem;
 }
 
 /* Expanded State */

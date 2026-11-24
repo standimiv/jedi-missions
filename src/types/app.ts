@@ -67,4 +67,5 @@ export type TodoAction =
   | {type: 'UPDATE_TODO'; payload: {id: string; text: string; difficulty: TaskDifficulty}}
   | {type: 'ADD_TEMPLATE'; payload: MissionTemplate}
   | {type: 'DELETE_TEMPLATE'; payload: string}
+  | {type: 'CLEAR_JOURNAL'}
   | {type: 'RESTORE'; payload: {todos: Todo[]; journal: JournalEntry[]; templates: MissionTemplate[]; swapiData: TemplateData}};

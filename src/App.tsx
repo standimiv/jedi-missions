@@ -21,6 +21,7 @@ const AppContent: React.FC = () => {
   const fileRef = useRef<HTMLInputElement>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [importError, setImportError] = useState<string | null>(null);
+  const [pane, setPane] = useState<'missions' | 'journal'>('missions');
   missionCount.current = state.todos.length;
   swapiDataRef.current = state.swapiData;
 
@@ -167,6 +168,26 @@ const AppContent: React.FC = () => {
               </span>
             </button>
           </div>
+          <div className="pane-switch" role="tablist" aria-label="View">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={pane === 'missions'}
+              className={pane === 'missions' ? 'is-selected' : ''}
+              onClick={() => setPane('missions')}
+            >
+              Missions
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={pane === 'journal'}
+              className={pane === 'journal' ? 'is-selected' : ''}
+              onClick={() => setPane('journal')}
+            >
+              Journal
+            </button>
+          </div>
 
           {/* Add Todo Component */}
           <AddTodo />
@@ -201,7 +222,7 @@ const AppContent: React.FC = () => {
 
         {/* Mission List */}
         <div className="mission-section">
-          <TodoList onRetry={loadMissions} />
+          <TodoList onRetry={loadMissions} pane={pane} />
         </div>
 
         {/* Status Information */}

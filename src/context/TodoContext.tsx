@@ -18,6 +18,8 @@ const createInitialState = (): AppState => {
 const nextId = (prefix: string): string =>
   `${prefix}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
+export const UNDO_WINDOW_MS = 5000;
+
 // Reducer function
 export const todoReducer = (state: AppState, action: TodoAction): AppState => {
   switch (action.type) {
@@ -125,6 +127,12 @@ export const todoReducer = (state: AppState, action: TodoAction): AppState => {
         templates: state.templates.filter(template => template.id !== action.payload),
       };
 
+    case 'CLEAR_JOURNAL':
+      return {
+        ...state,
+        journal: [],
+      };
+
     default:
       return state;
   }
@@ -151,6 +159,7 @@ interface TodoContextType {
   setSwapiData: (data: TemplateData) => void;
   addTemplate: (template: MissionTemplate) => void;
   deleteTemplate: (id: string) => void;
+  clearJournal: () => void;
 
   // Computed values
   completedTodos: Todo[];
@@ -205,7 +214,7 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({children}) => {
     const timer = window.setTimeout(() => {
       undoRef.current = null;
       setUndoTodo(null);
-    }, 5000);
+    }, UNDO_WINDOW_MS);
     return () => window.clearTimeout(timer);
   }, [undoTodo]);
 
@@ -284,6 +293,10 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({children}) => {
     dispatch({type: 'DELETE_TEMPLATE', payload: id});
   }, []);
 
+  const clearJournal = useCallback(() => {
+    dispatch({type: 'CLEAR_JOURNAL'});
+  }, []);
+
   const completedTodos = useMemo(
     () => state.todos.filter(todo => todo.completed),
     [state.todos]
@@ -334,6 +347,7 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({children}) => {
     setSwapiData,
     addTemplate,
     deleteTemplate,
+    clearJournal,
 
     // Computed values
     completedTodos,
@@ -357,6 +371,7 @@ export const TodoProvider: React.FC<TodoProviderProps> = ({children}) => {
     setSwapiData,
     addTemplate,
     deleteTemplate,
+    clearJournal,
     completedTodos,
     incompleteTodos,
     totalTodos,

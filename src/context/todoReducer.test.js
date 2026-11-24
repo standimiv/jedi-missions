@@ -95,3 +95,19 @@ test('saves a custom template once', () => {
   const cleared = todoReducer(twice, {type: 'DELETE_TEMPLATE', payload: 't'});
   expect(cleared.templates).toHaveLength(0);
 });
+
+test('clearing the journal leaves the missions', () => {
+  const withJournal = {
+    ...emptyState(),
+    todos: [{...todo, completed: true}],
+    journal: [{
+      id: 'journal_1',
+      text: todo.text,
+      difficulty: 'padawan',
+      completedAt: '2026-01-02T00:00:00.000Z',
+    }],
+  };
+  const next = todoReducer(withJournal, {type: 'CLEAR_JOURNAL'});
+  expect(next.journal).toEqual([]);
+  expect(next.todos).toHaveLength(1);
+});

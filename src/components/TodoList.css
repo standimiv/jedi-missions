@@ -163,29 +163,30 @@
 .stat-bar {
   display: block;
   width: 4.5rem;
-  height: 0.35rem;
+  height: 3px;
   margin-top: var(--spacing-xs);
-  background: var(--color-dark-accent);
-  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 2px;
   overflow: hidden;
 }
 
 .stat-bar-fill {
   display: block;
   height: 100%;
-  background: currentColor;
+  background: linear-gradient(90deg, #ffffff, currentColor);
+  box-shadow: 0 0 6px currentColor;
 }
 
 .stat-padawan .stat-bar-fill {
-  background: var(--color-padawan);
+  color: var(--color-padawan);
 }
 
 .stat-knight .stat-bar-fill {
-  background: var(--color-knight);
+  color: var(--color-knight);
 }
 
 .stat-master .stat-bar-fill {
-  background: var(--color-master);
+  color: var(--color-master);
 }
 
 .mission-filters {
@@ -221,7 +222,33 @@
 }
 
 .mission-journal {
-  margin-top: var(--spacing-xl);
+  margin-top: 0;
+}
+
+.journal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+}
+
+.journal-header .section-title {
+  margin-bottom: 0;
+}
+
+.journal-header button {
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: 1px solid currentColor;
+  border-radius: var(--border-radius-md);
+  padding: 0.2rem 0.7rem;
+  cursor: pointer;
+  font: inherit;
+}
+
+.journal-header button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 .undo-bar {
@@ -235,6 +262,36 @@
   border: 1px solid var(--color-sith-orange);
   border-radius: var(--border-radius-md);
   color: var(--color-text-primary);
+}
+
+.undo-blade {
+  flex: 1 0 100%;
+  height: 3px;
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.undo-blade-fill {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #ffffff, var(--color-sith-orange));
+  box-shadow: 0 0 6px var(--color-sith-orange);
+  transform-origin: left center;
+  animation: undo-shrink linear forwards;
+}
+
+@keyframes undo-shrink {
+  to {
+    width: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .undo-blade-fill {
+    animation: none;
+  }
 }
 
 .undo-bar button {
@@ -370,7 +427,8 @@
 }
 
 .completed-section .section-title {
-  color: var(--color-text-secondary);
+  color: var(--color-text-muted);
+  opacity: 0.7;
   text-shadow: none;
 }
 
